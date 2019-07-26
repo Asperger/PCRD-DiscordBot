@@ -6,7 +6,7 @@ from discord.ext import commands
 import asyncio
 import logging
 
-TOKEN = 'NjAzOTg2NDA4MzI3MzQ4MjU2.XTqeIA.UzuzfTbFaemqrVSUT_QJLtNqAqA'
+TOKEN = ''
 
 client = discord.Client()
 
