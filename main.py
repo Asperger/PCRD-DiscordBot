@@ -19,7 +19,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('!'):
-        msg = args.parse_args(message.content[1:])
+        msg = args.parse_args(message.author.id, message.content[1:])
         await message.channel.send(msg)
 
 @client.event
