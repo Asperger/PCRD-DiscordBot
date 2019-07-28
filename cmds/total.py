@@ -23,7 +23,7 @@ class total:
         utils.timer.timer_total = time.time()
 
         period = utils.db.find_last_period()
-        if not period or len(period) is not 2:
+        if not period or len(period) != 2:
             return
 
         where = 'play_date between \'{0}\' and \'{1}\''.format(period[0], period[1])

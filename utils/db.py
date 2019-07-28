@@ -112,7 +112,7 @@ def find_last_period():
     except Exception:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
 
-    if not result or len(result) is not 2:
+    if not result or len(result) != 2:
         FileLogger.error('Failed to collect play_date')
         return
 

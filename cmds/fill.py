@@ -20,7 +20,7 @@ class fill:
             return False
 
         boss_tag = param[0].split('-')
-        if len(boss_tag) is not 2:
+        if len(boss_tag) != 2:
             return False
         if not boss_tag[0].isdigit():
             return False
@@ -37,9 +37,9 @@ class fill:
         return True
 
     def run(self, user_id, *param):
-        if not param or len(param[0]) is 0:
+        if not param or len(param[0]) == 0:
             return self.usage
-        if param[0][0] is 'help':
+        if param[0][0] == 'help':
             return self.usage
         if not self.check_param(param[0]):
             return self.usage
@@ -48,7 +48,7 @@ class fill:
         column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
         result = utils.db.insert('TimeTable', column_value)
 
-        if len(param) is 3:
+        if len(param) == 3:
             pltype = self.play_type(param[2])
         else:
             pltype = 'normal_play'

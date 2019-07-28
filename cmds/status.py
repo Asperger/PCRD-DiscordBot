@@ -16,7 +16,7 @@ class status:
         if len(param) > 2:
             return False
         for p in param:
-            if p is 'all':
+            if p == 'all':
                 self.all_user = True
             else:
                 try:
@@ -26,7 +26,7 @@ class status:
         return True
 
     def run(self, user_id, *param):
-        if not param or len(param[0]) is 0:
+        if not param or len(param[0]) == 0:
             pass
         elif not self.check_param(param[0]):
             return self.usage
@@ -42,4 +42,4 @@ class status:
         return report
 
 if __name__ == '__main__':
-    print(status().run(123))
+    print(status().run(123,['all']))

@@ -3,9 +3,15 @@ from cmds.fill import fill
 from cmds.status import status
 
 from utils.log import FileLogger
+import time
+import utils.timer
 
 def usage():
-    return 'usage'
+    elapsed_time = time.time() - utils.timer.timer_usage
+    if elapsed_time < 30:
+        return '肚子餓了...'
+    utils.timer.timer_usage = time.time()
+    return '!fill 填表\n !status 查看出刀情況\n !total 查看傷害報告'
 
 def parse_args(user_id, string):
     args = string.split()
