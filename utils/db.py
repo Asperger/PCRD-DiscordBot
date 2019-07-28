@@ -8,11 +8,17 @@ from utils.log import FileLogger
 db_conn_path = os.path.join(os.path.dirname(__file__),'db_conn.json')
 with open(db_conn_path) as json_file:
     data = json.load(json_file)
-conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
 
 def query(table, where):
+    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+    try: 
+        cursor = conn.cursor() 
+    except pymssql.OperationalError: 
+        FileLogger.warning("Connection lost") 
+        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+        cursor = conn.cursor() 
+
     sql = 'SELECT * FROM {0} WHERE {1}'.format(table, where)
-    cursor = conn.cursor()
     result = []
     try:
         cursor.execute(sql)
@@ -40,7 +46,14 @@ def insert(table, column_value):
         values += '{0},'.format(column_value[i])
     sql = 'INSERT {0} ({1}) VALUES ({2})'.format(table, columns[:-1], values[:-1])
 
-    cursor = conn.cursor()        
+    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+    try: 
+        cursor = conn.cursor() 
+    except pymssql.OperationalError: 
+        FileLogger.warning("Connection lost") 
+        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+        cursor = conn.cursor() 
+
     cursor.execute("BEGIN TRANSACTION")
     try:
         cursor.execute(sql)
@@ -76,7 +89,14 @@ def upsert(table, column_value, where, incre=False):
             ELSE \
                 INSERT {0} ({3}) VALUES ({4})'.format(table, where, sets[:-1], columns[:-1], values[:-1])
 
-    cursor = conn.cursor()
+    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+    try: 
+        cursor = conn.cursor() 
+    except pymssql.OperationalError: 
+        FileLogger.warning("Connection lost") 
+        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+        cursor = conn.cursor()
+
     cursor.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
     cursor.execute("BEGIN TRANSACTION")
     try:

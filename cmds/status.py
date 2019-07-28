@@ -37,7 +37,10 @@ class status:
         result = utils.db.query('UserTable', where)
         report = ''
         for record in result:
-            report += '<@{0}> 總傷{1} 刀{2} 尾{3} 補{4} 閃{5}\n'.format(record['user_id'], record['damage'], record['normal_play'], record['last_play'], record['compensate_play'], record['missing_play'])
+            unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
+            if unfinished_play > 0:
+                unfinished = '仍有{0}刀未出'.format(unfinished_play)
+            report += '<@{0}> 總傷{1} 刀{2} 尾{3} 補{4} 閃{5} {6}\n'.format(record['user_id'], record['damage'], record['normal_play'], record['last_play'], record['compensate_play'], record['missing_play'], unfinished)
 
         return report
 
