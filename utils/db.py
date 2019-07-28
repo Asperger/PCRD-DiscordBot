@@ -122,7 +122,15 @@ def find_last_period():
             FROM t\
             GROUP BY DATEDIFF(day,i,d)\
             ORDER BY date_start DESC'
-    cursor = conn.cursor()
+
+    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+    try: 
+        cursor = conn.cursor() 
+    except pymssql.OperationalError: 
+        FileLogger.warning("Connection lost") 
+        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
+        cursor = conn.cursor()
+
     result = []
     try:
         cursor.execute(sql)
