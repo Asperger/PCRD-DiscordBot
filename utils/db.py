@@ -1,6 +1,7 @@
 import json
 import os
 import pymssql
+import datetime
 
 from utils.log import FileLogger
 
@@ -24,7 +25,6 @@ def query(table, where):
             row = cursor.fetchone()
     except pymssql.OperationalError:
         FileLogger.exception('SQL error')
-        conn.rollback()
     except Exception:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
     return result
@@ -91,3 +91,37 @@ def upsert(table, column_value, where, incre=False):
     cursor.execute("COMMIT TRANSACTION") 
     conn.commit()
     return True
+
+def find_last_period():
+    sql =  'WITH t AS (\
+                SELECT [play_date] d, ROW_NUMBER() OVER(ORDER BY [play_date]) i\
+                FROM [TimeTable]\
+                GROUP BY [play_date]\
+            )\
+            SELECT TOP 1 MIN(d) date_start, MAX(d) date_end\
+            FROM t\
+            GROUP BY DATEDIFF(day,i,d)\
+            ORDER BY date_start DESC'
+    cursor = conn.cursor()
+    result = []
+    try:
+        cursor.execute(sql)
+        result = cursor.fetchone()
+    except pymssql.OperationalError:
+        FileLogger.exception('SQL error')
+    except Exception:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
+
+    if not result or len(result) is not 2:
+        FileLogger.error('Failed to collect play_date')
+        return
+
+    parsed = []
+    try:
+        parsed.append(str(result[0]))
+        parsed.append(str(result[1]))
+    except ValueError:
+        FileLogger.exception('Date format error')
+        FileLogger.error('Collected play_date not valid')
+        return []
+    return parsed

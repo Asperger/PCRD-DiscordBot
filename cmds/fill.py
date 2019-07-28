@@ -54,7 +54,10 @@ class fill:
             pltype = 'normal_play'
         column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
         result = utils.db.upsert('UserTable', column_value, 'user_id={0}'.format(user_id), True)
-        return 'fill: {0}'.format(result)
+        if result:
+            return '<@{0}> 記錄成功'.format(user_id)
+        else:
+            return '<@{0}> 記錄失敗'.format(user_id)
 
 if __name__ == '__main__':
     print(fill().run(123))
