@@ -1,9 +1,11 @@
 from cmds.total import total
 from cmds.fill import fill
 from cmds.status import status
-from cmds.usage import usage
 
 from utils.log import FileLogger
+
+def usage():
+    return 'usage'
 
 def parse_args(user_id, string):
     args = string.split()
@@ -11,7 +13,7 @@ def parse_args(user_id, string):
     try:
         inst = globals()[args[0]]()
     except KeyError:
-        inst = usage()
+        return usage()
     except Exception:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
     # Execute the function
