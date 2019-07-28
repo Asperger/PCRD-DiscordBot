@@ -24,7 +24,10 @@ def parse_args(user_id, string):
         FileLogger.exception('Exception at '+__file__+' '+__name__)
     # Execute the function
     FileLogger.info('{0} call {1} with {2}'.format(user_id, args[0], args[1:]))
-    return inst.run(user_id, args[1:])
+    try:
+        return inst.run(user_id, args[1:])
+    except Exception:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
 
 if __name__ == '__main__':
     print(parse_args(123, 'status 2019-07-27'))
