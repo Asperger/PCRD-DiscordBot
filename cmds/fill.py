@@ -48,8 +48,8 @@ class fill:
         column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
         result = utils.db.insert('TimeTable', column_value)
 
-        if len(param) == 3:
-            pltype = self.play_type(param[2])
+        if len(param[0]) == 3:
+            pltype = self.play_type(param[0][2])
         else:
             pltype = 'normal_play'
         column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
