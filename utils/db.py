@@ -2,6 +2,8 @@ import json
 import os
 import pymssql
 
+from utils.log import FileLogger
+
 db_conn_path = os.path.join(os.path.dirname(__file__),'db_conn.json')
 with open(db_conn_path) as json_file:
     data = json.load(json_file)
@@ -21,7 +23,10 @@ def query(table, where):
             result.append(column_value)    
             row = cursor.fetchone()
     except pymssql.OperationalError:
+        FileLogger.exception('SQL error')
         conn.rollback()
+    except Exception:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
     return result
 
 def insert(table, column_value):
@@ -40,7 +45,11 @@ def insert(table, column_value):
     try:
         cursor.execute(sql)
     except pymssql.OperationalError:
+        FileLogger.exception('SQL error')
         conn.rollback()
+        return False
+    except Exception:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
         return False
     cursor.execute("COMMIT TRANSACTION") 
     conn.commit()
@@ -73,7 +82,11 @@ def upsert(table, column_value, where, incre=False):
     try:
         cursor.execute(sql)
     except pymssql.OperationalError:
+        FileLogger.exception('SQL error')
         conn.rollback()
+        return False
+    except Exception:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
         return False
     cursor.execute("COMMIT TRANSACTION") 
     conn.commit()
