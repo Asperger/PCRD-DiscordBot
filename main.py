@@ -13,6 +13,9 @@ client = discord.Client()
 
 @client.event
 async def on_message(message):
+    if message.content == '!stop':
+        await client.logout()
+
     # we do not want the bot to reply to itself
     if message.author.bot:
         return
