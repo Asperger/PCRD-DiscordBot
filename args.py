@@ -11,7 +11,7 @@ def usage():
     if elapsed_time < 30:
         return '肚子餓了...'
     utils.timer.timer_usage = time.time()
-    return '!fill 填表\n !status 查看出刀情況\n !total 查看傷害報告'
+    return '!fill 填表\n!status 查看出刀情況\n!total 查看傷害報告'
 
 def parse_args(user_id, string):
     args = string.split()
