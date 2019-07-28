@@ -37,6 +37,7 @@ class status:
         result = utils.db.query('UserTable', where)
         report = ''
         for record in result:
+            unfinished = ''
             unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
             if unfinished_play > 0:
                 unfinished = '仍有{0}刀未出'.format(unfinished_play)
