@@ -3,6 +3,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
+import utils.timer
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname
 
@@ -11,7 +12,7 @@ import datetime
 class status:
     def __init__(self):
         self.usage = '!status [all] [YYYY-MM-DD]'
-        self.date = datetime.datetime.now().strftime("%Y-%m-%d")
+        self.date = utils.timer.get_settlement_time()
         self.all_user = False
 
     def check_param(self, param):
