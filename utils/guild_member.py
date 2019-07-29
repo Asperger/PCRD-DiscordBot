@@ -15,4 +15,10 @@ def get_guild_member_nickname(guild_id, user_id):
         FileLogger.warn('Unknown user id')
         return
 
-    return guild_member_list[guild_id][user_id].nick
+    nick = guild_member_list[guild_id][user_id].nick
+    if nick:
+        return nick
+    display_name = guild_member_list[guild_id][user_id].display_name
+    if display_name:
+        return display_name
+    return guild_member_list[guild_id][user_id].name
