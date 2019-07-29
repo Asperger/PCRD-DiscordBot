@@ -7,5 +7,5 @@ setup(
     author='stkoso',
     author_email='stkoso0835@gmail.com',
     packages=['PCRD-DiscordBot'],
-    install_requires=['dblpy', 'discord.py', 'freetds-dev', 'freetds-bin', 'pymssql'],
+    install_requires=['dblpy', 'discord.py'],
 )
