@@ -3,6 +3,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
+from utils.log import FileLogger
 
 class fill:
     def __init__(self):
@@ -36,7 +37,7 @@ class fill:
 
         return True
 
-    def run(self, user_id, *param):
+    def run(self, client, user_id, *param):
         if not param or len(param[0]) == 0:
             return self.usage
         if param[0][0] == 'help':
@@ -45,19 +46,28 @@ class fill:
             return self.usage
 
         boss_tag = param[0][0].split('-')
-        column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
-        result = utils.db.insert('TimeTable', column_value)
 
         if len(param[0]) == 3:
             pltype = self.play_type(param[0][2])
         else:
             pltype = 'normal_play'
+
+        user = client.get_user(user_id)
+        if not user:
+            FileLogger.warn('Unexpected player: {0}'.format(user_id))
+            return
+
+        column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
+        result = utils.db.insert('TimeTable', column_value)
+        if not result:
+            return '{0} 記錄失敗'.format(user.display_name)
+
         column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
-        result = utils.db.upsert('UserTable', column_value, 'user_id={0}'.format(user_id), True)
+        result = utils.db.upsert('UserTable', column_value, 'user_id={0}'.format(user_id))
         if result:
-            return '<@{0}> 記錄成功'.format(user_id)
+            return '{0} 記錄成功'.format(user.display_name)
         else:
-            return '<@{0}> 記錄失敗'.format(user_id)
+            return '{0} 記錄失敗'.format(user.display_name)
 
 if __name__ == '__main__':
-    print(fill().run(123))
+    print(fill().run(None,123,['18-4','1722996','尾']))

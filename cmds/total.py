@@ -3,6 +3,7 @@ currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentfram
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
+from utils.log import FileLogger
 
 import time
 import utils.timer
@@ -13,7 +14,7 @@ class total:
     def __init__(self):
         self.usage = '!total'
 
-    def run(self, user_id, *param):
+    def run(self, client, user_id, *param):
         if param and len(param[0]) > 0:
             return self.usage
 
@@ -30,12 +31,17 @@ class total:
         result = utils.db.query('TimeTable', where)
         report = {}
         for record in result:
+            user = client.get_user(record['user_id'])
+            if not user:
+                FileLogger.warn('Unexpected player: {0}'.format(user_id))
+                continue
+
             stage = '3階'
             if record['rounds'] < 4:
                 stage = '1階'
             elif record['rounds'] < 12:
                 stage = '2階'
-            mentioned_id = '<@{0}>'.format(record['user_id'])
+            mentioned_id = user.display_name
             boss_str = str(record['boss'])+'王'
 
             if mentioned_id not in report:
@@ -47,7 +53,7 @@ class total:
 
             report[mentioned_id][stage][boss_str] += record['damage']
 
-        return json.dumps(report, sort_keys=True, indent=4, ensure_ascii=False).replace('{','').replace('}','').replace('\"','')
+        return json.dumps(report, sort_keys=True, indent=4, ensure_ascii=False).replace('\"','')
 
 if __name__ == '__main__':
-    print(total().run(123))
+    print(total().run(None,123))

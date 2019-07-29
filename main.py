@@ -7,13 +7,13 @@ import asyncio
 from utils.log import FileLogger
 
 from utils.token import get_token
-import args
+from args import parse_args
 
 client = discord.Client()
 
 @client.event
 async def on_message(message):
-    if message.content == '!stop':
+    if message.content == '!stop' and message.author.guild_permissions.administrator:
         await client.logout()
         return
 
@@ -22,7 +22,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('!'):
-        msg = args.parse_args(message.author.id, message.content[1:])
+        msg = parse_args(client, message.author.id, message.content[1:])
         if msg:
             await message.channel.send(msg)
 
