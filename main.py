@@ -9,6 +9,8 @@ from utils.log import FileLogger
 from utils.token import get_token
 from args import parse_args
 
+from utils.guild_member import setup_guild_member_list
+
 client = discord.Client()
 
 @client.event
@@ -22,7 +24,8 @@ async def on_message(message):
         return
 
     if message.content.startswith('!'):
-        msg = parse_args(client, message.author.id, message.content[1:])
+        setup_guild_member_list(message.author.guild)
+        msg = parse_args(message.author.guild.id, message.author.id, message.content[1:])
         if msg:
             await message.channel.send(msg)
 

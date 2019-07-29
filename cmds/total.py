@@ -7,6 +7,7 @@ from utils.log import FileLogger
 
 import time
 import utils.timer
+from utils.guild_member import get_guild_member_nickname
 
 import json
 
@@ -14,7 +15,7 @@ class total:
     def __init__(self):
         self.usage = '!total'
 
-    def run(self, client, user_id, *param):
+    def run(self, guild_id, user_id, *param):
         if param and len(param[0]) > 0:
             return self.usage
 
@@ -31,8 +32,8 @@ class total:
         result = utils.db.query('TimeTable', where)
         report = {}
         for record in result:
-            user = client.get_user(record['user_id'])
-            if not user:
+            user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
+            if not user_nickname:
                 FileLogger.warn('Unexpected player: {0}'.format(record['user_id']))
                 continue
 
@@ -41,17 +42,16 @@ class total:
                 stage = '1階'
             elif record['rounds'] < 12:
                 stage = '2階'
-            mentioned_id = user.display_name
             boss_str = str(record['boss'])+'王'
 
-            if mentioned_id not in report:
-                report[mentioned_id] = {}
-            if stage not in report[mentioned_id]:
-                report[mentioned_id][stage] = {}
-            if boss_str not in report[mentioned_id][stage]:
-                report[mentioned_id][stage][boss_str] = 0
+            if user_nickname not in report:
+                report[user_nickname] = {}
+            if stage not in report[user_nickname]:
+                report[user_nickname][stage] = {}
+            if boss_str not in report[user_nickname][stage]:
+                report[user_nickname][stage][boss_str] = 0
 
-            report[mentioned_id][stage][boss_str] += record['damage']
+            report[user_nickname][stage][boss_str] += record['damage']
 
         return json.dumps(report, sort_keys=True, indent=2, ensure_ascii=False)
 

@@ -13,7 +13,7 @@ def usage():
     utils.timer.timer_usage = time.time()
     return '!fill 填表\n!status 查看出刀情況\n!total 查看傷害報告'
 
-def parse_args(client, user_id, string):
+def parse_args(guild_id, user_id, string):
     args = string.split()
     # Create the instance
     try:
@@ -25,7 +25,7 @@ def parse_args(client, user_id, string):
     # Execute the function
     FileLogger.info('{0} call {1} with {2}'.format(user_id, args[0], args[1:]))
     try:
-        return inst.run(client, user_id, args[1:])
+        return inst.run(guild_id, user_id, args[1:])
     except Exception:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
 

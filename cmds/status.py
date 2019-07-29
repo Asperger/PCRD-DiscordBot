@@ -4,6 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
 from utils.log import FileLogger
+from utils.guild_member import get_guild_member_nickname
 
 import datetime
 
@@ -27,7 +28,7 @@ class status:
                 self.date = p
         return True
 
-    def run(self, client, user_id, *param):
+    def run(self, guild_id, user_id, *param):
         if not param or len(param[0]) == 0:
             pass
         elif not self.check_param(param[0]):
@@ -41,8 +42,8 @@ class status:
         player_count = 0
         total_unfinished_play = 0
         for record in result:
-            user = client.get_user(record['user_id'])
-            if not user:
+            user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
+            if not user_nickname:
                 FileLogger.warn('Unexpected player: {0}'.format(record['user_id']))
                 continue
             comment = ''
@@ -51,7 +52,7 @@ class status:
             total_unfinished_play += unfinished_play
             if unfinished_play > 0:
                 comment = '仍有{0}刀未出'.format(unfinished_play)
-            report += '{0} 總傷{1} 刀{2} 尾{3} 補{4} 閃{5} {6}\n'.format(user.display_name, record['damage'], record['normal_play'], record['last_play'], record['compensate_play'], record['missing_play'], comment)
+            report += '{0} 總傷{1} 刀{2} 尾{3} 補{4} 閃{5} {6}\n'.format(user_nickname, record['damage'], record['normal_play'], record['last_play'], record['compensate_play'], record['missing_play'], comment)
 
         if self.all_user:
             report += '共{0}刀未出'.format((30-player_count)*3+total_unfinished_play)
