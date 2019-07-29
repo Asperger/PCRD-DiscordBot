@@ -33,7 +33,7 @@ class total:
         for record in result:
             user = client.get_user(record['user_id'])
             if not user:
-                FileLogger.warn('Unexpected player: {0}'.format(user_id))
+                FileLogger.warn('Unexpected player: {0}'.format(record['user_id']))
                 continue
 
             stage = '3階'
@@ -53,7 +53,7 @@ class total:
 
             report[mentioned_id][stage][boss_str] += record['damage']
 
-        return json.dumps(report, sort_keys=True, indent=4, ensure_ascii=False).replace('\"','')
+        return json.dumps(report, sort_keys=True, indent=2, ensure_ascii=False)
 
 if __name__ == '__main__':
     print(total().run(None,123))

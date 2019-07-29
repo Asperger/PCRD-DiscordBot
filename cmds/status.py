@@ -43,7 +43,7 @@ class status:
         for record in result:
             user = client.get_user(record['user_id'])
             if not user:
-                FileLogger.warn('Unexpected player: {0}'.format(user_id))
+                FileLogger.warn('Unexpected player: {0}'.format(record['user_id']))
                 continue
             comment = ''
             player_count += 1

@@ -22,7 +22,8 @@ config = {
             'formatter': 'simple',
             'when': 'D',
             'interval': 1,
-            'backupCount': 10
+            'backupCount': 10,
+            'encoding': 'utf-8'
         }
     },
     'loggers':{

@@ -6,7 +6,6 @@ from utils.log import FileLogger
 import utils.timer
 
 import sqlite3
-print(sqlite3.sqlite_version)
 db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
 conn = sqlite3.connect(db_conn_path)
 
