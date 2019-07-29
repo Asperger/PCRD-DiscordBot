@@ -60,7 +60,7 @@ def increment(table, column_value, where):
         if where.startswith(i):
             continue
         sets += '''{0}={0}+{1},'''.format(i, column_value[i])
-    sql = '''UPDATE {0} SET {1} WHERE {2}'''.format(table, sets, where)
+    sql = '''UPDATE {0} SET {1} WHERE {2}'''.format(table, sets[:-1], where)
 
     cursor = conn.cursor()
     cursor.execute("BEGIN")
