@@ -7,5 +7,5 @@ setup(
     author='stkoso',
     author_email='stkoso0835@gmail.com',
     packages=['PCRD-DiscordBot'],
-    install_requires=['dblpy', 'discord.py'],
+    install_requires=['pytz', 'dblpy', 'discord.py'],
 )
