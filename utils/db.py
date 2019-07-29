@@ -1,24 +1,19 @@
 import json
 import os
-import pymssql
 import datetime
 
 from utils.log import FileLogger
+import utils.timer
 
-db_conn_path = os.path.join(os.path.dirname(__file__),'db_conn.json')
-with open(db_conn_path) as json_file:
-    data = json.load(json_file)
+import sqlite3
+print(sqlite3.sqlite_version)
+db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
+conn = sqlite3.connect(db_conn_path)
 
 def query(table, where):
-    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-    try: 
-        cursor = conn.cursor() 
-    except pymssql.OperationalError: 
-        FileLogger.warning("Connection lost") 
-        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-        cursor = conn.cursor() 
+    cursor = conn.cursor()
 
-    sql = 'SELECT * FROM {0} WHERE {1}'.format(table, where)
+    sql = '''SELECT * FROM {0} WHERE {1}'''.format(table, where)
     result = []
     try:
         cursor.execute(sql)
@@ -29,9 +24,7 @@ def query(table, where):
                 column_value[str(cursor.description[i][0])] = row[i]
             result.append(column_value)    
             row = cursor.fetchone()
-    except pymssql.OperationalError:
-        FileLogger.exception('SQL error')
-    except Exception:
+    except sqlite3.OperationalError:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
     return result
 
@@ -44,100 +37,80 @@ def insert(table, column_value):
     for i in column_value:
         columns += '{0},'.format(i)
         values += '{0},'.format(column_value[i])
-    sql = 'INSERT {0} ({1}) VALUES ({2})'.format(table, columns[:-1], values[:-1])
+    play_date = utils.timer.get_settlement_time()
+    sql = '''INSERT INTO {0} ({1}play_date) VALUES ({2}'{3}')'''.format(table, columns, values, play_date)
 
-    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-    try: 
-        cursor = conn.cursor() 
-    except pymssql.OperationalError: 
-        FileLogger.warning("Connection lost") 
-        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-        cursor = conn.cursor() 
-
-    cursor.execute("BEGIN TRANSACTION")
+    cursor = conn.cursor()
+    cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except pymssql.OperationalError:
-        FileLogger.exception('SQL error')
+    except sqlite3.OperationalError:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
         conn.rollback()
         return False
-    except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
-        return False
-    cursor.execute("COMMIT TRANSACTION") 
+    cursor.execute("COMMIT") 
     conn.commit()
     return True
 
-def upsert(table, column_value, where, incre=False):
+def increment(table, column_value, where):
     if not column_value:
         return False
 
     sets = ''
-    columns = ''
-    values = ''
     for i in column_value:
-        columns += '{0},'.format(i)
-        values += '{0},'.format(column_value[i])
         if where.startswith(i):
             continue
-        if incre:
-            sets += '{0}={0}+{1},'.format(i, column_value[i])
-        else:
-            sets += '{0}={1},'.format(i, column_value[i])
-    sql =  'IF EXISTS ( SELECT * FROM {0} WITH (UPDLOCK) WHERE {1})\
-                UPDATE {0} SET {2} WHERE {1}\
-            ELSE \
-                INSERT {0} ({3}) VALUES ({4})'.format(table, where, sets[:-1], columns[:-1], values[:-1])
+        sets += '''{0}={0}+{1},'''.format(i, column_value[i])
+    sql = '''UPDATE {0} SET {1} WHERE {2}'''.format(table, sets, where)
 
-    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-    try: 
-        cursor = conn.cursor() 
-    except pymssql.OperationalError: 
-        FileLogger.warning("Connection lost") 
-        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-        cursor = conn.cursor()
-
-    cursor.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
-    cursor.execute("BEGIN TRANSACTION")
+    cursor = conn.cursor()
+    cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except pymssql.OperationalError:
-        FileLogger.exception('SQL error')
+    except sqlite3.OperationalError:
+        FileLogger.exception('Exception at '+__file__+' '+__name__)
         conn.rollback()
         return False
-    except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
-        return False
-    cursor.execute("COMMIT TRANSACTION") 
+    cursor.execute("COMMIT") 
     conn.commit()
     return True
 
+def upsert(table, column_value, where):
+    if not column_value:
+        return False
+
+    play_date = utils.timer.get_settlement_time()
+    where += ''' AND play_date='{0}' '''.format(play_date)
+    result = query(table, where)
+
+    if result:
+        return increment(table, column_value, where)
+    else:
+        return insert(table, column_value)
+
 def find_last_period():
-    sql =  'WITH t AS (\
-                SELECT [play_date] d, ROW_NUMBER() OVER(ORDER BY [play_date]) i\
-                FROM [TimeTable]\
-                GROUP BY [play_date]\
-            )\
-            SELECT TOP 1 MIN(d) date_start, MAX(d) date_end\
-            FROM t\
-            GROUP BY DATEDIFF(day,i,d)\
-            ORDER BY date_start DESC'
+    sql ='''WITH 
+                dates(cast_date) AS (
+                    SELECT DISTINCT play_date
+                    FROM TimeTable
+                ),
+                groups AS (
+                    SELECT
+                        date(cast_date, '-'||(ROW_NUMBER() OVER (ORDER BY cast_date))||' days') AS grp,
+                        cast_date
+                    FROM dates
+                )
+            SELECT
+                MIN(cast_date) AS date_start,
+                MAX(cast_date) AS date_end
+            FROM groups GROUP BY grp ORDER BY 2 DESC LIMIT 1'''
 
-    conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-    try: 
-        cursor = conn.cursor() 
-    except pymssql.OperationalError: 
-        FileLogger.warning("Connection lost") 
-        conn = pymssql.connect(server=data['server'], user=data['user'], password=data['password'], database=data['database'])
-        cursor = conn.cursor()
-
+    cursor = conn.cursor() 
     result = []
     try:
         cursor.execute(sql)
         result = cursor.fetchone()
-    except pymssql.OperationalError:
-        FileLogger.exception('SQL error')
-    except Exception:
+    except sqlite3.OperationalError:
         FileLogger.exception('Exception at '+__file__+' '+__name__)
 
     if not result or len(result) != 2:
