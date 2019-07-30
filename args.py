@@ -21,13 +21,13 @@ def parse_args(guild_id, user_id, string):
     except KeyError:
         return usage()
     except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}')
     # Execute the function
-    FileLogger.info('{0} call {1} with {2}'.format(user_id, args[0], args[1:]))
+    FileLogger.info(f'{user_id} call {args[0]} with {args[1:]}')
     try:
         return inst.run(guild_id, user_id, args[1:])
     except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}')
 
 if __name__ == '__main__':
     print(parse_args(None, 123, 'status 2019-07-27'))

@@ -28,13 +28,13 @@ class total:
         if not period or len(period) != 2:
             return
 
-        where = 'play_date between \'{0}\' and \'{1}\''.format(period[0], period[1])
+        where = f"play_date between '{period[0]}' and '{period[1]}'"
         result = utils.db.query('TimeTable', where)
         report = {}
         for record in result:
             user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
             if not user_nickname:
-                FileLogger.warn('Unexpected player: {0}'.format(record['user_id']))
+                FileLogger.warn(f"Unexpected player: {record['user_id']}")
                 continue
 
             stage = '3階'
