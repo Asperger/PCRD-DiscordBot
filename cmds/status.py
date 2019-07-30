@@ -56,7 +56,10 @@ class status:
             report += f"{user_nickname} 總傷{record['damage']} 刀{record['normal_play']} 尾{record['last_play']} 補{record['compensate_play']} 閃{record['missing_play']} {comment}\n"
 
         if self.all_user:
-            report += f'共{(30-player_count)*3+total_unfinished_play}刀未出'
+            if player_count == 0:
+                report = '還沒有人出刀呢...大家是不是肚子餓了?'
+            else:
+                report += f'共{(30-player_count)*3+total_unfinished_play}刀未出'
         elif not report:
             report = '你還沒出刀呢...是不是肚子餓了?'
 

@@ -1,10 +1,16 @@
+import time
+import utils.timer
 from utils.log import FileLogger
 
 guild_member_list = {}
 
 def setup_guild_member_list(guild):
-    if guild.id not in guild_member_list:
-        guild_member_list[guild.id] = { guild.members[i].id : guild.members[i] for i in range(0, len(guild.members) ) }
+    if guild.id in guild_member_list:
+        elapsed_time = time.time() - utils.timer.timer_member_list[guild.id]
+        if elapsed_time < 86400:
+            return
+    utils.timer.timer_member_list[guild.id] = time.time()
+    guild_member_list[guild.id] = { guild.members[i].id : guild.members[i] for i in range(0, len(guild.members) ) }
 
 def get_guild_member_nickname(guild_id, user_id):
     if guild_id not in guild_member_list:
