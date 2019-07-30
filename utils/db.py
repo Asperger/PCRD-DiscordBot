@@ -9,6 +9,28 @@ import utils.timer
 import sqlite3
 db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
 conn = sqlite3.connect(db_conn_path)
+try:
+    conn.executescript(
+        '''CREATE TABLE "TimeTable" (
+            "user_id"	INTEGER NOT NULL,
+            "rounds"	INTEGER NOT NULL,
+            "boss"	INTEGER NOT NULL,
+            "damage"	INTEGER NOT NULL,
+            "play_date"	TEXT NOT NULL
+        );
+        CREATE TABLE "UserTable" (
+            "user_id"	INTEGER NOT NULL,
+            "damage"	INTEGER NOT NULL,
+            "normal_play"	INTEGER DEFAULT 0,
+            "last_play"	INTEGER DEFAULT 0,
+            "compensate_play"	INTEGER DEFAULT 0,
+            "missing_play"	INTEGER DEFAULT 0,
+            "play_date"	TEXT NOT NULL
+        );'''
+    )
+except sqlite3.OperationalError:
+    pass
+
 sqlur = SQLiteUndoRedo(conn)
 sqlur.activate('TimeTable', 'UserTable')
 
