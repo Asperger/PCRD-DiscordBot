@@ -3,11 +3,14 @@ import os
 import datetime
 
 from utils.log import FileLogger
+from utils.sqlite_undoredo import SQLiteUndoRedo
 import utils.timer
 
 import sqlite3
 db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
 conn = sqlite3.connect(db_conn_path)
+sqlur = SQLiteUndoRedo(conn)
+sqlur.activate('TimeTable', 'UserTable')
 
 def query(table, where):
     cursor = conn.cursor()

@@ -68,6 +68,7 @@ class fill:
         column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
         result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
         if result:
+            utils.db.sqlur.barrier()
             return f'{user_nickname} 記錄成功'
         else:
             return f'{user_nickname} 記錄失敗'

@@ -1,6 +1,8 @@
 from cmds.total import total
 from cmds.fill import fill
 from cmds.status import status
+from cmds.undo import undo
+from cmds.redo import redo
 
 from utils.log import FileLogger
 import time
