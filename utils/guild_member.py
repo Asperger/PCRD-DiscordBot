@@ -11,8 +11,14 @@ def setup_guild_member_list(guild):
             return
     guild_member_list[guild.id] = {}
     for i in range(0, len(guild.members)):
-        if '隊員' not in guild.members[i].roles:
+        valid = False
+        for role in guild.members[i].roles:
+            if role.name == '隊員':
+                valid = True
+                break
+        if not valid:
             continue
+
         nick = guild.members[i].nick
         display_name = guild.members[i].display_name
         if nick:
