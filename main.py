@@ -44,7 +44,7 @@ async def on_member_join(member):
     if not member.bot:
         for channel in member.guild.channels:
             if channel.name == '公會大廳':
-                await channel.send(f':PC_NinoHey: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage()}')
+                await channel.send(f':grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage()}')
 
 @client.event
 async def on_ready():
