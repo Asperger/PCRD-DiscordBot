@@ -31,7 +31,7 @@ async def on_message(message):
             if isinstance(msg, collections.Mapping):
                 # it's a dict
                 for key in msg:
-                    await message.channel.send(json.dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False))
+                    await message.channel.send(f'{key}: {json.dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False)}')
             elif isinstance(msg, list):
                 # it's a list
                 for i in range(len(msg)):
