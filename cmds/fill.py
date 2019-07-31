@@ -35,7 +35,7 @@ class fill:
         if len(param) == 3:
             if param[2] not in ('尾', '補', '閃'):
                 return False
-            if param[2] == '尾' and param[1] != 0:
+            if param[2] == '閃' and param[1] != 0:
                 return False
 
         return True
