@@ -6,6 +6,4 @@ logs/
 *.db3
 *.sqlite
 *.sqlite3
-credentials.json
-db_conn.json
 token.json

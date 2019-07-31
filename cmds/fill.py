@@ -41,6 +41,10 @@ class fill:
         return True
 
     def run(self, guild_id, user_id, *param):
+        user_nickname = get_guild_member_nickname(guild_id, user_id)
+        if not user_nickname:
+            return '你不是這個公會的隊員吧?'
+
         if not param or len(param[0]) == 0:
             return self.usage
         if param[0][0] == 'help':
@@ -55,10 +59,6 @@ class fill:
         else:
             pltype = 'normal_play'
 
-        user_nickname = get_guild_member_nickname(guild_id, user_id)
-        if not user_nickname:
-            FileLogger.warn(f'Unexpected player: {user_id}')
-            return
 
         column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
         result = utils.db.insert('TimeTable', column_value)

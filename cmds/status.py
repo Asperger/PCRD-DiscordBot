@@ -5,7 +5,7 @@ sys.path.insert(0, parentdir)
 import utils.db
 import utils.timer
 from utils.log import FileLogger
-from utils.guild_member import get_guild_member_nickname
+from utils.guild_member import get_guild_member_nickname, get_guild_member_list
 
 import datetime
 
@@ -40,28 +40,35 @@ class status:
 
         result = utils.db.query('UserTable', where)
         report = ''
-        player_count = 0
+        member_list = get_guild_member_list(guild_id)
+        player_count = len(member_list)
         total_unfinished_play = 0
         for record in result:
             user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
             if not user_nickname:
                 FileLogger.warn(f"Unexpected player: {record['user_id']}")
                 continue
+
             comment = ''
-            player_count += 1
-            unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
+            unfinished_play = abs(3 - (record['normal_play']+record['missing_play']+record['compensate_play']))
             total_unfinished_play += unfinished_play
             if unfinished_play > 0:
                 comment = f'仍有{unfinished_play}刀未出'
+
             report += f"{user_nickname} 總傷{record['damage']} 刀{record['normal_play']} 尾{record['last_play']} 補{record['compensate_play']} 閃{record['missing_play']} {comment}\n"
+            member_list.remove(record['user_id'])
 
         if self.all_user:
-            if player_count == 0:
+            if player_count == len(member_list):
                 report = '還沒有人出刀呢...大家是不是肚子餓了?'
             else:
-                report += f'共{(30-player_count)*3+total_unfinished_play}刀未出'
+                report += f'{" ".join(member_list)}未出刀'
         elif not report:
-            report = '你還沒出刀呢...是不是肚子餓了?'
+            author_nickname = get_guild_member_nickname(guild_id, user_id)
+            if author_nickname:
+                report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
+            else:
+                report = '你不是這個公會的隊員吧?'
 
         return report
 

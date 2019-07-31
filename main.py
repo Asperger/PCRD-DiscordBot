@@ -2,7 +2,8 @@
 import dbl
 import discord
 from discord.ext import commands
-
+import json
+import collections
 import asyncio
 from utils.log import FileLogger
 
@@ -27,7 +28,16 @@ async def on_message(message):
         setup_guild_member_list(message.author.guild)
         msg = parse_args(message.author.guild.id, message.author.id, message.content[1:])
         if msg:
-            await message.channel.send(msg)
+            if isinstance(msg, collections.Mapping):
+                # it's a dict
+                for key in msg:
+                    await message.channel.send(json.dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False))
+            elif isinstance(msg, list):
+                # it's a list
+                for i in range(len(msg)):
+                    await message.channel.send(msg[i])
+            else:
+                await message.channel.send(msg)
 
 @client.event
 async def on_ready():

@@ -7,9 +7,7 @@ from utils.log import FileLogger
 
 import time
 import utils.timer
-from utils.guild_member import get_guild_member_nickname
-
-import json
+from utils.guild_member import get_guild_member_nickname, get_guild_member_list
 
 class total:
     def __init__(self):
@@ -20,7 +18,7 @@ class total:
             return self.usage
 
         elapsed_time = time.time() - utils.timer.timer_total
-        if elapsed_time < 30:
+        if elapsed_time < 60:
             return '肚子餓了...'
         utils.timer.timer_total = time.time()
 
@@ -31,6 +29,7 @@ class total:
         where = f"play_date between '{period[0]}' and '{period[1]}'"
         result = utils.db.query('TimeTable', where)
         report = {}
+        member_list = get_guild_member_list(guild_id)
         for record in result:
             user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
             if not user_nickname:
@@ -52,8 +51,16 @@ class total:
                 report[user_nickname][stage][boss_str] = 0
 
             report[user_nickname][stage][boss_str] += record['damage']
+            member_list.remove(record['user_id'])
 
-        return json.dumps(report, sort_keys=True, indent=2, ensure_ascii=False)
+        for unattend_player in member_list:
+            user_nickname = get_guild_member_nickname(guild_id, unattend_player)
+            if not user_nickname:
+                FileLogger.warn(f"Unexpected player: {unattend_player}")
+                continue
+            report[user_nickname] = ""
+
+        return report
 
 if __name__ == '__main__':
     print(total().run(None,123))
