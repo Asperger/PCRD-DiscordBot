@@ -62,7 +62,14 @@ class status:
             if player_count == len(member_list):
                 report = '還沒有人出刀呢...大家是不是肚子餓了?'
             else:
-                report += f'{" ".join(member_list)}未出刀'
+                unattend = ''
+                for unattend_player in member_list:
+                    user_nickname = get_guild_member_nickname(guild_id, unattend_player)
+                    if not user_nickname:
+                        FileLogger.warn(f"Unexpected player: {unattend_player}")
+                        continue
+                    unattend += f'{user_nickname} '
+                report += f'{unattend}未出刀'
         elif not report:
             author_nickname = get_guild_member_nickname(guild_id, user_id)
             if author_nickname:
