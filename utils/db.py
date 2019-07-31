@@ -3,16 +3,41 @@ import os
 import datetime
 
 from utils.log import FileLogger
+from utils.sqlite_undoredo import SQLiteUndoRedo
 import utils.timer
 
 import sqlite3
 db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
 conn = sqlite3.connect(db_conn_path)
+try:
+    conn.executescript(
+        '''CREATE TABLE "TimeTable" (
+            "user_id"	INTEGER NOT NULL,
+            "rounds"	INTEGER NOT NULL,
+            "boss"	INTEGER NOT NULL,
+            "damage"	INTEGER NOT NULL,
+            "play_date"	TEXT NOT NULL
+        );
+        CREATE TABLE "UserTable" (
+            "user_id"	INTEGER NOT NULL,
+            "damage"	INTEGER NOT NULL,
+            "normal_play"	INTEGER DEFAULT 0,
+            "last_play"	INTEGER DEFAULT 0,
+            "compensate_play"	INTEGER DEFAULT 0,
+            "missing_play"	INTEGER DEFAULT 0,
+            "play_date"	TEXT NOT NULL
+        );'''
+    )
+except sqlite3.OperationalError:
+    pass
+
+sqlur = SQLiteUndoRedo(conn)
+sqlur.activate('TimeTable', 'UserTable')
 
 def query(table, where):
     cursor = conn.cursor()
 
-    sql = '''SELECT * FROM {0} WHERE {1}'''.format(table, where)
+    sql = f'''SELECT * FROM {table} WHERE {where}'''
     result = []
     try:
         cursor.execute(sql)
@@ -24,7 +49,7 @@ def query(table, where):
             result.append(column_value)    
             row = cursor.fetchone()
     except sqlite3.OperationalError:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
     return result
 
 def insert(table, column_value):
@@ -37,14 +62,14 @@ def insert(table, column_value):
         columns += '{0},'.format(i)
         values += '{0},'.format(column_value[i])
     play_date = utils.timer.get_settlement_time()
-    sql = '''INSERT INTO {0} ({1}play_date) VALUES ({2}'{3}')'''.format(table, columns, values, play_date)
+    sql = f'''INSERT INTO {table} ({columns}play_date) VALUES ({values}'{play_date}')'''
 
     cursor = conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
     except sqlite3.OperationalError:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
         conn.rollback()
         return False
     cursor.execute("COMMIT") 
@@ -59,15 +84,15 @@ def increment(table, column_value, where):
     for i in column_value:
         if where.startswith(i):
             continue
-        sets += '''{0}={0}+{1},'''.format(i, column_value[i])
-    sql = '''UPDATE {0} SET {1} WHERE {2}'''.format(table, sets[:-1], where)
+        sets += f'''{i}={i}+{column_value[i]},'''
+    sql = f'''UPDATE {table} SET {sets[:-1]} WHERE {where}'''
 
     cursor = conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
     except sqlite3.OperationalError:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
         conn.rollback()
         return False
     cursor.execute("COMMIT") 
@@ -79,7 +104,7 @@ def upsert(table, column_value, where):
         return False
 
     play_date = utils.timer.get_settlement_time()
-    where += ''' AND play_date='{0}' '''.format(play_date)
+    where += f''' AND play_date='{play_date}' '''
     result = query(table, where)
 
     if result:
@@ -110,7 +135,7 @@ def find_last_period():
         cursor.execute(sql)
         result = cursor.fetchone()
     except sqlite3.OperationalError:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
 
     if not result or len(result) != 2:
         FileLogger.error('Failed to collect play_date')

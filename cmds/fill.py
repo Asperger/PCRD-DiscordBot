@@ -35,10 +35,16 @@ class fill:
         if len(param) == 3:
             if param[2] not in ('尾', '補', '閃'):
                 return False
+            if param[2] == '尾' and param[1] != 0:
+                return False
 
         return True
 
     def run(self, guild_id, user_id, *param):
+        user_nickname = get_guild_member_nickname(guild_id, user_id)
+        if not user_nickname:
+            return '你不是這個公會的隊員吧?'
+
         if not param or len(param[0]) == 0:
             return self.usage
         if param[0][0] == 'help':
@@ -53,22 +59,19 @@ class fill:
         else:
             pltype = 'normal_play'
 
-        user_nickname = get_guild_member_nickname(guild_id, user_id)
-        if not user_nickname:
-            FileLogger.warn('Unexpected player: {0}'.format(user_id))
-            return
 
         column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
         result = utils.db.insert('TimeTable', column_value)
         if not result:
-            return '{0} 記錄失敗'.format(user_nickname)
+            return f'{user_nickname} 記錄失敗'
 
         column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
-        result = utils.db.upsert('UserTable', column_value, 'user_id={0}'.format(user_id))
+        result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
         if result:
-            return '{0} 記錄成功'.format(user_nickname)
+            utils.db.sqlur.barrier()
+            return f'{user_nickname} 記錄成功'
         else:
-            return '{0} 記錄失敗'.format(user_nickname)
+            return f'{user_nickname} 記錄失敗'
 
 if __name__ == '__main__':
     print(fill().run(None,123,['18-4','1722996','尾']))

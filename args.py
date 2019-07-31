@@ -1,6 +1,8 @@
 from cmds.total import total
 from cmds.fill import fill
 from cmds.status import status
+from cmds.undo import undo
+from cmds.redo import redo
 
 from utils.log import FileLogger
 import time
@@ -11,7 +13,7 @@ def usage():
     if elapsed_time < 30:
         return '肚子餓了...'
     utils.timer.timer_usage = time.time()
-    return '!fill 填表\n!status 查看出刀情況\n!total 查看傷害報告'
+    return '!fill 填表\n!status 查看出刀情況\n!total 查看傷害報告\n!undo 取消上次輸入的內容\n!redo 重新輸入上次取消的內容'
 
 def parse_args(guild_id, user_id, string):
     args = string.split()
@@ -21,13 +23,13 @@ def parse_args(guild_id, user_id, string):
     except KeyError:
         return usage()
     except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}')
     # Execute the function
-    FileLogger.info('{0} call {1} with {2}'.format(user_id, args[0], args[1:]))
+    FileLogger.info(f'{user_id} call {args[0]} with {args[1:]}')
     try:
         return inst.run(guild_id, user_id, args[1:])
     except Exception:
-        FileLogger.exception('Exception at '+__file__+' '+__name__)
+        FileLogger.exception(f'Exception at {__file__} {__name__}')
 
 if __name__ == '__main__':
     print(parse_args(None, 123, 'status 2019-07-27'))

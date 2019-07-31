@@ -2,12 +2,13 @@
 import dbl
 import discord
 from discord.ext import commands
-
+import json
+import collections
 import asyncio
 from utils.log import FileLogger
 
 from utils.token import get_token
-from args import parse_args
+from args import parse_args, usage
 
 from utils.guild_member import setup_guild_member_list
 
@@ -27,10 +28,26 @@ async def on_message(message):
         setup_guild_member_list(message.author.guild)
         msg = parse_args(message.author.guild.id, message.author.id, message.content[1:])
         if msg:
-            await message.channel.send(msg)
+            if isinstance(msg, collections.Mapping):
+                # it's a dict
+                for key in msg:
+                    await message.channel.send(f'{key}: {json.dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False)}')
+            elif isinstance(msg, list):
+                # it's a list
+                for i in range(len(msg)):
+                    await message.channel.send(msg[i])
+            else:
+                await message.channel.send(msg)
+
+@client.event
+async def on_member_join(member):
+    if not member.bot:
+        for channel in member.guild.channels:
+            if channel.name == '公會大廳':
+                await channel.send(f':PC_NinoHey: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage()}')
 
 @client.event
 async def on_ready():
-    FileLogger.info('Logged in as '+client.user.name+'('+str(client.user.id)+')')
+    FileLogger.info(f'Logged in as {client.user.name}({client.user.id})')
 
 client.run(get_token())
