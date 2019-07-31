@@ -41,7 +41,7 @@ class total:
                 stage = '1階'
             elif record['rounds'] < 12:
                 stage = '2階'
-            boss_str = str(record['boss'])+'王'
+            boss_str = f"{record['boss']}王"
 
             if user_nickname not in report:
                 report[user_nickname] = {}

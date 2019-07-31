@@ -42,7 +42,6 @@ class status:
         report = ''
         member_list = get_guild_member_list(guild_id)
         player_count = len(member_list)
-        total_unfinished_play = 0
         for record in result:
             user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
             if not user_nickname:
@@ -50,8 +49,7 @@ class status:
                 continue
 
             comment = ''
-            unfinished_play = abs(3 - (record['normal_play']+record['missing_play']+record['compensate_play']))
-            total_unfinished_play += unfinished_play
+            unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
             if unfinished_play > 0:
                 comment = f'仍有{unfinished_play}刀未出'
 
