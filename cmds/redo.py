@@ -11,7 +11,7 @@ class redo:
         if not user_nickname:
             return '你不是這個公會的隊員吧?'
         try:
-            utils.db.sqlur.redo()
+            description = utils.db.sqlur.redo()
         except Exception:
             return '沒有可以重做的紀錄'
-        return '已重做'
+        return f'已重做 {description}'

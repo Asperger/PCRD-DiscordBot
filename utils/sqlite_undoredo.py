@@ -88,7 +88,7 @@ class SQLiteUndoRedo:
             raise NotImplementedError
             # set _undo(pending) after idle ::undo::barrier
 
-    def barrier(self):
+    def barrier(self, description):
         """Create an undo barrier right now."""
         _undo = self._undo
         try:
@@ -108,17 +108,17 @@ class SQLiteUndoRedo:
         if begin == _undo['firstlog']:
             # self.refresh()
             return
-        _undo['undostack'].append([begin, end])
+        _undo['undostack'].append([begin, end, description])
         _undo['redostack'] = []
         # self.refresh()
 
     def undo(self):
         """Do a single step of undo."""
-        self._step('undostack', 'redostack')
+        return self._step('undostack', 'redostack')
 
     def redo(self):
         """Redo a single step."""
-        self._step('redostack', 'undostack')
+        return self._step('redostack', 'undostack')
 
     def refresh(self):
         """Update the status of controls after a database change.
@@ -257,7 +257,7 @@ class SQLiteUndoRedo:
         _undo = self._undo
         op = _undo[v1][-1]
         _undo[v1] = _undo[v1][0:-1]
-        (begin, end) = op
+        (begin, end, description) = op
         self._db.execute('BEGIN')
         q1 = f"SELECT sql FROM undolog WHERE seq>={begin} AND seq<={end}" \
              " ORDER BY seq DESC"
@@ -272,6 +272,7 @@ class SQLiteUndoRedo:
 
         end = self._db.execute("SELECT coalesce(max(seq),0) FROM undolog").fetchone()[0]
         begin = _undo['firstlog']
-        _undo[v2].append([begin, end])
+        _undo[v2].append([begin, end, description])
         self._start_interval()
         # self.refresh()
+        return description

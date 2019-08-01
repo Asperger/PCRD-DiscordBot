@@ -11,7 +11,7 @@ class undo:
         if not user_nickname:
             return '你不是這個公會的隊員吧?'
         try:
-            utils.db.sqlur.undo()
+            description = utils.db.sqlur.undo()
         except Exception:
             return '沒有可以取消的紀錄'
-        return '已取消'
+        return f'已取消 {description}'
