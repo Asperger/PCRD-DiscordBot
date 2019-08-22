@@ -50,8 +50,10 @@ class status:
 
             comment = ''
             unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
+            if unfinished_play < 3:
+                comment += f"已出{record['played_boss']}王 "
             if unfinished_play > 0:
-                comment = f'仍有{unfinished_play}刀未出'
+                comment += f'仍有{unfinished_play}刀未出'
 
             report += f"{user_nickname} 總傷{record['damage']} 刀{record['normal_play']} 尾{record['last_play']} 補{record['compensate_play']} 閃{record['missing_play']} {comment}\n"
             member_list.remove(record['user_id'])

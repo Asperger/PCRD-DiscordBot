@@ -21,11 +21,12 @@ try:
         CREATE TABLE "UserTable" (
             "user_id"	INTEGER NOT NULL,
             "damage"	INTEGER NOT NULL,
-            "normal_play"	INTEGER DEFAULT 0,
-            "last_play"	INTEGER DEFAULT 0,
-            "compensate_play"	INTEGER DEFAULT 0,
-            "missing_play"	INTEGER DEFAULT 0,
-            "play_date"	TEXT NOT NULL
+            "normal_play"	INTEGER NOT NULL DEFAULT 0,
+            "last_play"	INTEGER NOT NULL DEFAULT 0,
+            "compensate_play"	INTEGER NOT NULL DEFAULT 0,
+            "missing_play"	INTEGER NOT NULL DEFAULT 0,
+            "play_date"	TEXT NOT NULL,
+            "played_boss"	TEXT NOT NULL
         );'''
     )
 except sqlite3.OperationalError:
@@ -84,7 +85,10 @@ def increment(table, column_value, where):
     for i in column_value:
         if where.startswith(i):
             continue
-        sets += f'''{i}={i}+{column_value[i]},'''
+        if type(column_value[i]) is str:
+            sets += f'''{i}={i}||','||{column_value[i]},'''
+        else:
+            sets += f'''{i}={i}+{column_value[i]},'''
     sql = f'''UPDATE {table} SET {sets[:-1]} WHERE {where}'''
 
     cursor = conn.cursor()

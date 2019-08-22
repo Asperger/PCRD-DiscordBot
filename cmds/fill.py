@@ -65,7 +65,7 @@ class fill:
         if not result:
             return f'{user_nickname} 記錄失敗'
 
-        column_value = {'user_id':user_id, 'damage':param[0][1], pltype:1}
+        column_value = {'user_id':user_id, 'damage':int(param[0][1]), pltype:1, 'played_boss':str(boss_tag[1])}
         result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
         if result:
             utils.db.sqlur.barrier(f'{user_nickname} fill {" ".join(param[0])}')
