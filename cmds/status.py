@@ -61,7 +61,7 @@ class status:
         if self.all_user:
             if player_count == len(member_list):
                 report = '還沒有人出刀呢...大家是不是肚子餓了?'
-            else:
+            elif member_list:
                 unattend = ''
                 for unattend_player in member_list:
                     user_nickname = get_guild_member_nickname(guild_id, unattend_player)
