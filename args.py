@@ -8,6 +8,14 @@ from utils.log import FileLogger
 import time
 import utils.timer
 
+cmds_registry = {
+    "total": "total",
+    "fill": "fill",
+    "test": "status",
+    "undo": "undo",
+    "redo": "redo",
+}
+
 def usage():
     elapsed_time = time.time() - utils.timer.timer_usage
     if elapsed_time < 30:
@@ -19,7 +27,7 @@ def parse_args(guild_id, user_id, string):
     args = string.split()
     # Create the instance
     try:
-        inst = globals()[args[0]]()
+        inst = globals()[cmds_registry[args[0]]]()
     except KeyError:
         return usage()
     except Exception:
