@@ -10,7 +10,7 @@ from utils.log import FileLogger
 from utils.token import get_token
 from args import parse_args, usage
 
-from utils.guild_member import setup_guild_member_list
+from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 
 client = discord.Client()
 
@@ -49,5 +49,7 @@ async def on_member_join(member):
 @client.event
 async def on_ready():
     FileLogger.info(f'Logged in as {client.user.name}({client.user.id})')
+    for guild in client.guilds:
+        setup_guild_channel_list(guild)
 
 client.run(get_token())

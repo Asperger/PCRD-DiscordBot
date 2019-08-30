@@ -3,6 +3,7 @@ import utils.timer
 from utils.log import FileLogger
 
 guild_member_list = {}
+guild_channel_list = {}
 
 def setup_guild_member_list(guild):
     if guild.id in guild_member_list:
@@ -45,3 +46,29 @@ def get_guild_member_list(guild_id):
         FileLogger.warn('Unknown guild id')
         return
     return set(guild_member_list[guild_id].keys())
+
+def setup_guild_channel_list(guild):
+    if guild.id in guild_channel_list:
+        elapsed_time = time.time() - utils.timer.timer_channel_list[guild.id]
+        if elapsed_time < 86400:
+            return
+    guild_channel_list[guild.id] = {}
+    for channel in guild.channels:
+        if channel.type.name == 'text':
+            if channel.name.startswith('一王-'):
+                guild_channel_list[guild.id][1] = channel.id
+            elif channel.name.startswith('二王-'):
+                guild_channel_list[guild.id][2] = channel.id
+            elif channel.name.startswith('三王-'):
+                guild_channel_list[guild.id][3] = channel.id
+            elif channel.name.startswith('四王-'):
+                guild_channel_list[guild.id][4] = channel.id
+            elif channel.name.startswith('五王-'):
+                guild_channel_list[guild.id][5] = channel.id
+    utils.timer.timer_channel_list[guild.id] = time.time()
+
+def get_guild_channel_list(guild_id):
+    if guild_id not in guild_channel_list:
+        FileLogger.warn('Unknown guild id')
+        return
+    return guild_channel_list[guild_id]
