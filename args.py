@@ -3,6 +3,8 @@ from cmds.fill import fill
 from cmds.status import status
 from cmds.undo import undo
 from cmds.redo import redo
+from cmds.ping import ping
+from cmds.lineup import lineup
 
 from utils.log import FileLogger
 import time
@@ -11,9 +13,11 @@ import utils.timer
 cmds_registry = {
     "total": "total",
     "fill": "fill",
-    "test": "status",
+    "status": "status",
     "undo": "undo",
     "redo": "redo",
+    "ping": "ping",
+    "+1": "lineup",
 }
 
 def usage():
@@ -30,8 +34,11 @@ def parse_args(guild_id, user_id, string):
         inst = globals()[cmds_registry[args[0]]]()
     except KeyError:
         return usage()
+    except IndexError:
+        return usage()
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')
+        return
     # Execute the function
     FileLogger.info(f'{user_id} call {args[0]} with {args[1:]}')
     try:
