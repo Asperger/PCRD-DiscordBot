@@ -41,18 +41,30 @@ _undo = {}
 _undo['undostack'] = []
 _undo['redostack'] = []
 
+def get_sheets_id():
+    global spreadsheet_id
+    return spreadsheet_id
+
 def switch_sheets(sheet_id):
     global spreadsheet_id
     spreadsheet_id = sheet_id
 
 def read_sheet(range_name):
-    sheets = service.spreadsheets()
-    result = sheets.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+    try:
+        sheets = service.spreadsheets()
+        result = sheets.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+    except Exception as e:
+        FileLogger.error(f'Fail to read sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        return
     return result.get('values', [])
 
 def write_sheet(range_name, body, option='RAW'):
-    sheets = service.spreadsheets()
-    result = sheets.values().update(spreadsheetId=spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
+    try:
+        sheets = service.spreadsheets()
+        result = sheets.values().update(spreadsheetId=spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
+    except Exception as e:
+        FileLogger.error(f'Fail to write sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        return
     return result
 
 def get_start_date():
@@ -60,8 +72,8 @@ def get_start_date():
     values = read_sheet('角色列表!A2:A2')
 
     if not values:
-        FileLogger.error('No player list found.')
-        return
+        FileLogger.error('No start date found.')
+        return None
     else:
         date_tokens = values[0][0].split('/')
         settlement_time = get_settlement_time_object()
@@ -74,7 +86,7 @@ def get_player_list():
 
     if not values:
         FileLogger.error('No player list found.')
-        return
+        return None
     else:
         player_list = {}
         for row in values:

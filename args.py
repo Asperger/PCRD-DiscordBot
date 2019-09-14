@@ -5,6 +5,7 @@ from cmds.undo import undo
 from cmds.redo import redo
 from cmds.ping import ping
 from cmds.lineup import lineup
+from cmds.switch_sheets import switch_sheets
 
 from utils.log import FileLogger
 import time
@@ -18,6 +19,7 @@ cmds_registry = {
     "redo": "redo",
     "ping": "ping",
     "+1": "lineup",
+    "switch_sheets": "switch_sheets"
 }
 
 def usage():
