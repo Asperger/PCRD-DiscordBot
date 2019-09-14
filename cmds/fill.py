@@ -41,7 +41,10 @@ class fill:
 
         return True
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
+        guild_id = user_auth['guild_id']
+        user_id = user_auth['user_id']
+
         user_nickname = get_guild_member_nickname(guild_id, user_id)
         if not user_nickname:
             return '你不是這個公會的隊員吧?'
@@ -83,4 +86,9 @@ class fill:
             return f'{user_nickname} Local記錄失敗'
 
 if __name__ == '__main__':
-    print(fill().run(None,123,['18-4','1722996','尾']))
+    user_auth = {
+        'guild_id': None,
+        'user_id': 123,
+        'user_admin': False
+    }
+    print(fill().run(user_auth,['18-4','1722996','尾']))

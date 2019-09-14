@@ -26,7 +26,12 @@ async def on_message(message):
 
     if message.content.startswith('!'):
         setup_guild_member_list(message.author.guild)
-        msg = parse_args(message.author.guild.id, message.author.id, message.content[1:])
+        user_auth = {
+            'guild_id': message.author.guild.id,
+            'user_id': message.author.id,
+            'user_admin': message.author.guild_permissions.administrator
+        }
+        msg = parse_args(user_auth, message.content[1:])
         if msg:
             if isinstance(msg, collections.Mapping):
                 # it's a dict

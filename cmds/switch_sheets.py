@@ -13,16 +13,20 @@ class switch_sheets:
     def check_param(self, param):
         if len(param) != 1:
             return False
+        else:
+            return True
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
         if not self.check_param(param[0]):
             return self.usage
-        # check authentication
+        if not user_auth['user_admin']:
+            return '只有公會的管理員才能使用這個功能'
 
         old_id = sheet.get_sheets_id()
         sheet.switch_sheets(param[0][0])
         start_date = sheet.get_start_date()
-        if start_date:
+        player_list = sheet.get_player_list()
+        if start_date and player_list:
             return f'試算表已切換為ID: {param[0][0]}'
         else:
             sheet.switch_sheets(old_id)

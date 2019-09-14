@@ -8,6 +8,6 @@ class ping:
     def __init__(self):
         self.usage = '!ping'
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
         if param and len(param[0]) > 0:
             return self.usage

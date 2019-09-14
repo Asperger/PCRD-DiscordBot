@@ -90,7 +90,7 @@ def get_player_list():
     else:
         player_list = {}
         for row in values:
-            player_list[int(row[1])] = int(row[0])*3
+            player_list[int(row[1])] = int(row[0])*3-1
         return player_list
 
 def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
@@ -102,7 +102,7 @@ def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
     row_number = 3 + 6 * play_day_offset.days + (3 if option == '補' else 0)
     row_offset = 2 if option == '補' else 5
 
-    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+1)}{row_number+row_offset}'
+    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+2)}{row_number+row_offset}'
     current_state = read_sheet(range_name)
     found_cell = False
     for index in range(len(current_state)):
@@ -121,12 +121,12 @@ def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
     body = {
         'values': [
             [
-                boss_tag, damage
+                option, boss_tag, damage
             ]
         ]
     }
 
-    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+1)}{row_number}'
+    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+2)}{row_number}'
     result = write_sheet(range_name, body)
     updated_range = result.get('updatedRange')
     if updated_range:
@@ -146,7 +146,7 @@ def undo():
     empty_body = {
         'values': [
             [
-                '', ''
+                '', '', ''
             ]
         ]
     }
@@ -191,6 +191,6 @@ if __name__ == '__main__':
     switch_sheets('1eucoItgkCSRhV46XKqMEGmNG_5Ob6Es2O60ordUc-_4')
     print(get_start_date())
     print(get_player_list())
-    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005', '6-5', 2856005)
+    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', '6-5', 2856005, '尾')
     undo()
     redo()

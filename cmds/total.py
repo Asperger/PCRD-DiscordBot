@@ -13,9 +13,10 @@ class total:
     def __init__(self):
         self.usage = '!total'
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
         if param and len(param[0]) > 0:
             return self.usage
+        guild_id = user_auth['guild_id']
 
         elapsed_time = time.time() - utils.timer.timer_total
         if elapsed_time < 60:
@@ -63,4 +64,9 @@ class total:
         return report
 
 if __name__ == '__main__':
-    print(total().run(None,123))
+    user_auth = {
+        'guild_id': None,
+        'user_id': 123,
+        'user_admin': False
+    }
+    print(total().run(user_auth))

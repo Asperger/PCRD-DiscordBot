@@ -10,6 +10,6 @@ class lineup:
     def __init__(self):
         self.usage = '!+1'
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
         if param and len(param[0]) > 0:
             return self.usage

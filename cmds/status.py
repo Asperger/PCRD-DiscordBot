@@ -29,11 +29,13 @@ class status:
                 self.date = p
         return True
 
-    def run(self, guild_id, user_id, *param):
+    def run(self, user_auth, *param):
         if not param or len(param[0]) == 0:
             pass
         elif not self.check_param(param[0]):
             return self.usage
+        guild_id = user_auth['guild_id']
+        user_id = user_auth['user_id']
         where = f"play_date='{self.date}'"
         if not self.all_user:
             where += f' AND user_id={user_id}'
@@ -80,4 +82,9 @@ class status:
         return report
 
 if __name__ == '__main__':
-    print(status().run(None,123,['all']))
+    user_auth = {
+        'guild_id': None,
+        'user_id': 123,
+        'user_admin': False
+    }
+    print(status().run(user_auth,['all']))
