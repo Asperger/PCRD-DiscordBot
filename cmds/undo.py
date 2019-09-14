@@ -1,4 +1,5 @@
 import utils.db
+import utils.google_sheets_utils
 from utils.guild_member import get_guild_member_nickname
 
 class undo:
@@ -12,6 +13,7 @@ class undo:
             return '你不是這個公會的隊員吧?'
         try:
             description = utils.db.sqlur.undo()
+            utils.google_sheets_utils.undo()
         except Exception:
             return '沒有可以取消的紀錄'
         return f'已取消 {description}'

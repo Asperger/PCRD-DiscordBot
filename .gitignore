@@ -6,4 +6,5 @@ logs/
 *.db3
 *.sqlite
 *.sqlite3
-token.json
+*.json
+token.pickle

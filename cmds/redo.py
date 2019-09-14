@@ -1,4 +1,5 @@
 import utils.db
+import utils.google_sheets_utils
 from utils.guild_member import get_guild_member_nickname
 
 class redo:
@@ -12,6 +13,7 @@ class redo:
             return '你不是這個公會的隊員吧?'
         try:
             description = utils.db.sqlur.redo()
+            utils.google_sheets_utils.redo()
         except Exception:
             return '沒有可以重做的紀錄'
         return f'已重做 {description}'

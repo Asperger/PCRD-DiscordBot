@@ -5,6 +5,7 @@ sys.path.insert(0, parentdir)
 import utils.db
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname
+from utils.google_sheets_utils import fill_sheet
 
 class fill:
     def __init__(self):
@@ -52,26 +53,34 @@ class fill:
         if not self.check_param(param[0]):
             return self.usage
 
-        boss_tag = param[0][0].split('-')
+        boss_tag = param[0][0]
+        boss_tags = boss_tag.split('-')
 
         if len(param[0]) == 3:
             pltype = self.play_type(param[0][2])
+            ploption = param[0][2]
         else:
             pltype = 'normal_play'
+            ploption = ''
 
-
-        column_value = {'user_id':user_id, 'rounds':boss_tag[0], 'boss':boss_tag[1], 'damage':param[0][1]}
+        damage = int(param[0][1])
+        column_value = {'user_id':user_id, 'rounds':boss_tags[0], 'boss':boss_tags[1], 'damage':damage}
         result = utils.db.insert('TimeTable', column_value)
         if not result:
             return f'{user_nickname} 記錄失敗'
 
-        column_value = {'user_id':user_id, 'damage':int(param[0][1]), pltype:1, 'played_boss':str(boss_tag[1])}
-        result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
-        if result:
-            utils.db.sqlur.barrier(f'{user_nickname} fill {" ".join(param[0])}')
-            return f'{user_nickname} 記錄成功'
+        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1])}
+        db_result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
+        if db_result:
+            description = f'{user_nickname} fill {" ".join(param[0])}'
+            utils.db.sqlur.barrier(description)
+            sheet_result = fill_sheet(user_id, description, boss_tag, damage, ploption)
+            if sheet_result:
+                return f'{user_nickname} 記錄成功'
+            else:
+                return f'{user_nickname} Sheet記錄失敗'
         else:
-            return f'{user_nickname} 記錄失敗'
+            return f'{user_nickname} Local記錄失敗'
 
 if __name__ == '__main__':
     print(fill().run(None,123,['18-4','1722996','尾']))
