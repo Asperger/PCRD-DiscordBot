@@ -30,4 +30,6 @@ class switch_sheets:
             return f'試算表已切換為ID: {param[0][0]}'
         else:
             sheet.switch_sheets(old_id)
+            sheet.get_start_date()
+            sheet.get_player_list()
             return f'試算表ID: {param[0][0]} 錯誤或試算表格式不對'

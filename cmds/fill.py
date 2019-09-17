@@ -74,16 +74,17 @@ class fill:
 
         column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1])}
         db_result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
-        if db_result:
-            description = f'{user_nickname} fill {" ".join(param[0])}'
-            utils.db.sqlur.barrier(description)
-            sheet_result = fill_sheet(user_id, description, boss_tag, damage, ploption)
-            if sheet_result:
-                return f'{user_nickname} 記錄成功'
-            else:
-                return f'{user_nickname} Sheet記錄失敗'
-        else:
-            return f'{user_nickname} Local記錄失敗'
+        if not db_result:
+            return f'{user_nickname} 記錄失敗'
+
+        description = f'{user_nickname} fill {" ".join(param[0])}'
+        utils.db.sqlur.barrier(description)
+
+        sheet_result = fill_sheet(user_id, description, boss_tag, damage, ploption)
+        if not sheet_result:
+            return f'{user_nickname} 試算表記錄失敗'
+
+        return f'{user_nickname} 記錄成功'
 
 if __name__ == '__main__':
     user_auth = {

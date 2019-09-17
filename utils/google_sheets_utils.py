@@ -98,6 +98,9 @@ def get_player_list():
 def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
     global _undo, _sheet_lock
     _sheet_lock.acquire()
+    if player_discord_id not in player_list:
+        FileLogger.warn(f'Discord ID: {player_discord_id} not found in sheet')
+        return False
     player_offset = player_list[player_discord_id]
 
     today = get_settlement_time_object()
