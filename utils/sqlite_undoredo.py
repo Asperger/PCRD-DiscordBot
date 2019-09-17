@@ -18,12 +18,14 @@ import re
 import sqlite3
 import sys
 
+import threading
 
 if sys.version_info < (3, 6):
     sys.exit('Python version 3.6 or later is required')
 
 
 class SQLiteUndoRedo:
+    _sqlur_lock = threading.RLock()
 
     def activate(self, *args):
         """Start up the undo/redo system.
@@ -90,6 +92,8 @@ class SQLiteUndoRedo:
 
     def barrier(self, description):
         """Create an undo barrier right now."""
+        SQLiteUndoRedo._sqlur_lock.acquire()
+
         _undo = self._undo
         try:
             pass
@@ -111,6 +115,8 @@ class SQLiteUndoRedo:
         _undo['undostack'].append([begin, end, description])
         _undo['redostack'] = []
         # self.refresh()
+
+        SQLiteUndoRedo._sqlur_lock.release()
 
     def undo(self):
         """Do a single step of undo."""
@@ -254,6 +260,8 @@ class SQLiteUndoRedo:
         For an undo V1=="undostack" and V2=="redostack".  For a redo,
         V1=="redostack" and V2=="undostack".
         """
+        SQLiteUndoRedo._sqlur_lock.acquire()
+
         _undo = self._undo
         op = _undo[v1][-1]
         _undo[v1] = _undo[v1][0:-1]
@@ -275,4 +283,6 @@ class SQLiteUndoRedo:
         _undo[v2].append([begin, end, description])
         self._start_interval()
         # self.refresh()
+
+        SQLiteUndoRedo._sqlur_lock.release()
         return description

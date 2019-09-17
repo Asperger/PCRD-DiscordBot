@@ -5,6 +5,7 @@ sys.path.insert(0, parentdir)
 
 import pickle
 import os.path
+import threading
 from datetime import datetime
 from utils.log import FileLogger
 from utils.timer import get_settlement_time_object
@@ -40,6 +41,7 @@ player_list = {}
 _undo = {}
 _undo['undostack'] = []
 _undo['redostack'] = []
+_sheet_lock = threading.RLock()
 
 def get_sheets_id():
     global spreadsheet_id
@@ -94,7 +96,8 @@ def get_player_list():
         return player_list
 
 def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
-    global _undo
+    global _undo, _sheet_lock
+    _sheet_lock.acquire()
     player_offset = player_list[player_discord_id]
 
     today = get_settlement_time_object()
@@ -132,13 +135,16 @@ def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
     if updated_range:
         _undo['undostack'].append([updated_range, body, description])
         _undo['redostack'] = []
+        _sheet_lock.release()
         return True
     else:
         FileLogger.error(f'Fail to write sheet: {description}')
+        _sheet_lock.release()
         return False
 
 def undo():
-    global _undo
+    global _undo, _sheet_lock
+    _sheet_lock.acquire()
     op = _undo['undostack'][-1]
     _undo['undostack'] = _undo['undostack'][0:-1]
     (range_name, body, description) = op
@@ -155,12 +161,16 @@ def undo():
     updated_range = result.get('updatedRange')
     if updated_range and range_name == updated_range:
         _undo['redostack'].append([updated_range, body, description])
+        _sheet_lock.release()
         return description
     else:
         FileLogger.error(f'Inconsistent undo result: {description}')
+        _sheet_lock.release()
+        return None
 
 def redo():
-    global _undo
+    global _undo, _sheet_lock
+    _sheet_lock.acquire()
     op = _undo['redostack'][-1]
     _undo['redostack'] = _undo['redostack'][0:-1]
     (range_name, body, description) = op
@@ -170,9 +180,12 @@ def redo():
     updated_range = result.get('updatedRange')
     if updated_range and range_name == updated_range:
         _undo['undostack'].append([updated_range, body, description])
+        _sheet_lock.release()
         return description
     else:
         FileLogger.error(f'Inconsistent redo result: {description}')
+        _sheet_lock.release()
+        return None
 
 def column_number_to_letter(input_column_number):
     output_column_name = ""
@@ -194,3 +207,27 @@ if __name__ == '__main__':
     fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', '6-5', 2856005, '尾')
     undo()
     redo()
+
+    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678', '6-5', 2345678))
+    t1u = threading.Thread(target=undo)
+    t1r = threading.Thread(target=redo)
+
+    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', '7-1', 1234567))
+    t2u = threading.Thread(target=undo)
+    t2r = threading.Thread(target=redo)
+
+    t1f.start()
+    t1u.start()
+    t1r.start()
+
+    t2f.start()
+    t2u.start()
+    t2r.start()
+
+    t1f.join()
+    t1u.join()
+    t1r.join()
+
+    t2f.join()
+    t2u.join()
+    t2r.join()
