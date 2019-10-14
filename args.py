@@ -1,4 +1,3 @@
-from cmds.total import total
 from cmds.fill import fill
 from cmds.status import status
 from cmds.undo import undo
@@ -12,7 +11,6 @@ import time
 import utils.timer
 
 cmds_registry = {
-    "total": "total",
     "fill": "fill",
     "status": "status",
     "undo": "undo",
