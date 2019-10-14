@@ -33,9 +33,11 @@ def parse_args(user_auth, string):
     try:
         inst = globals()[cmds_registry[args[0]]]()
     except KeyError:
-        return usage()
+        FileLogger.exception(f'No command found')
+        return
     except IndexError:
-        return usage()
+        FileLogger.exception(f'No command found')
+        return
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')
         return
