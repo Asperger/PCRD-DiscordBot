@@ -4,12 +4,13 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
 from utils.log import FileLogger
+from utils.timer import get_settlement_time
 from utils.guild_member import get_guild_member_nickname
 from utils.google_sheets_utils import fill_sheet
 
 class fill:
     def __init__(self):
-        self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補|閃]'
+        self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補|閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'
 
     def play_type(self, x):
         return {
@@ -40,6 +41,15 @@ class fill:
                 return False
 
         return True
+
+    def get_played_number(self, user_id):
+        date = get_settlement_time()
+        where = f"play_date='{date}' AND user_id={user_id}"
+        result = utils.db.query('UserTable', where)
+        if result:
+            return result[0]['normal_play']+result[0]['missing_play']+result[0]['compensate_play']
+        else:
+            return 0
 
     def run(self, user_auth, *param):
         guild_id = user_auth['guild_id']
@@ -80,7 +90,8 @@ class fill:
         description = f'{user_nickname} fill {" ".join(param[0])}'
         utils.db.sqlur.barrier(description)
 
-        sheet_result = fill_sheet(user_id, description, boss_tag, damage, ploption)
+        plnumber = self.get_played_number(user_id)
+        sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption)
         if not sheet_result:
             return f'{user_nickname} 試算表記錄失敗'
 

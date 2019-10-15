@@ -69,9 +69,18 @@ def write_sheet(range_name, body, option='RAW'):
         return
     return result
 
+def append_sheet(range_name, body, option='RAW'):
+    try:
+        sheets = service.spreadsheets()
+        result = sheets.values().append(spreadsheetId=spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
+    except Exception as e:
+        FileLogger.error(f'Fail to append sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        return
+    return result
+
 def get_start_date():
     global start_date
-    values = read_sheet('角色列表!A2:A2')
+    values = read_sheet('隊員列表!A1:A1')
 
     if not values:
         FileLogger.error('No start date found.')
@@ -84,7 +93,7 @@ def get_start_date():
 
 def get_player_list():
     global player_list
-    values = read_sheet('角色列表!A3:B')
+    values = read_sheet('隊員列表!B2:C')
 
     if not values:
         FileLogger.error('No player list found.')
@@ -92,49 +101,38 @@ def get_player_list():
     else:
         player_list = {}
         for row in values:
-            player_list[int(row[1])] = int(row[0])*3-1
+            player_list[int(row[1])] = row[0]
         return player_list
 
-def fill_sheet(player_discord_id, description, boss_tag, damage, option=''):
+def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, option=''):
     global _undo, _sheet_lock
     _sheet_lock.acquire()
     if player_discord_id not in player_list:
         FileLogger.warn(f'Discord ID: {player_discord_id} not found in sheet')
         return False
-    player_offset = player_list[player_discord_id]
+    player_nickname = player_list[player_discord_id]
 
     today = get_settlement_time_object()
-    play_day_offset = today - start_date
-    row_number = 3 + 6 * play_day_offset.days + (3 if option == '補' else 0)
-    row_offset = 2 if option == '補' else 5
-
-    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+2)}{row_number+row_offset}'
-    current_state = read_sheet(range_name)
-    found_cell = False
-    for index in range(len(current_state)):
-        if not current_state[index]:
-            row_number += index
-            found_cell = True
-            break
-
-    if not found_cell:
-        if len(current_state) < row_offset+1:
-            row_number += len(current_state)
-        else:
-            FileLogger.error(f'Table runs out of space: {description}')
-            return False
-
+    play_tag = f"{play_number}{'B' if option == '補' else 'A'}"
+    missing_tag = '' if option != '閃' else option
     body = {
         'values': [
             [
-                option, boss_tag, damage
+                today.strftime("%Y/%m/%d %H:%M:%S"), player_nickname, play_tag, damage, boss_tag, missing_tag
             ]
         ]
     }
 
-    range_name = f'輸入區!{column_number_to_letter(player_offset)}{row_number}:{column_number_to_letter(player_offset+2)}{row_number}'
-    result = write_sheet(range_name, body)
-    updated_range = result.get('updatedRange')
+    play_day_offset = today - start_date
+    range_name = f'Day {play_day_offset.days + 1}-Log!A2:F'
+    result = append_sheet(range_name, body)
+
+    updates = result.get('updates')
+    if not updates:
+        FileLogger.error(f'Fail to write sheet: {description}')
+        return False
+
+    updated_range = updates.get('updatedRange')
     if updated_range:
         _undo['undostack'].append([updated_range, body, description])
         _undo['redostack'] = []
@@ -155,7 +153,7 @@ def undo():
     empty_body = {
         'values': [
             [
-                '', '', ''
+                '', '', '', '', '', ''
             ]
         ]
     }
@@ -204,18 +202,19 @@ def column_number_to_letter(input_column_number):
 if __name__ == '__main__':
     assert(column_number_to_letter(89) == 'CK')
     assert(column_number_to_letter(78) == 'BZ')
-    switch_sheets('1eucoItgkCSRhV46XKqMEGmNG_5Ob6Es2O60ordUc-_4')
+    #switch_sheets('1eucoItgkCSRhV46XKqMEGmNG_5Ob6Es2O60ordUc-_4')
+    switch_sheets('1f3lGlsbr-nc4k8rNwzw1QRDAoqQhrnzXmfY8LMSeNs0')
     print(get_start_date())
     print(get_player_list())
-    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', '6-5', 2856005, '尾')
+    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', 1, '6-5', 2856005, '尾')
     undo()
     redo()
 
-    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678', '6-5', 2345678))
+    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '閃'))
     t1u = threading.Thread(target=undo)
     t1r = threading.Thread(target=redo)
 
-    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', '7-1', 1234567))
+    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567))
     t2u = threading.Thread(target=undo)
     t2r = threading.Thread(target=redo)
 
