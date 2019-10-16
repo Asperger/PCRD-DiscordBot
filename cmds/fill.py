@@ -10,17 +10,16 @@ from utils.google_sheets_utils import fill_sheet
 
 class fill:
     def __init__(self):
-        self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補|閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'
+        self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補] [閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'
 
     def play_type(self, x):
         return {
             '尾': 'last_play',
-            '補': 'compensate_play',
-            '閃': 'missing_play'
+            '補': 'compensate_play'
         }.get(x, 'normal_play')  
 
     def check_param(self, param):
-        if len(param) < 2 or len(param) > 3:
+        if len(param) < 2 or len(param) > 4:
             return False
 
         boss_tag = param[0].split('-')
@@ -38,6 +37,12 @@ class fill:
             if param[2] not in ('尾', '補', '閃'):
                 return False
 
+        if len(param) == 4:
+            if param[2] not in ('尾', '補'):
+                return False
+            if param[3] != '閃':
+                return False
+
         return True
 
     def get_played_number(self, user_id):
@@ -45,7 +50,7 @@ class fill:
         where = f"play_date='{date}' AND user_id={user_id}"
         result = utils.db.query('UserTable', where)
         if result:
-            return result[0]['normal_play']+result[0]['missing_play']+result[0]['compensate_play']
+            return result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play'])
         else:
             return 0
 
@@ -68,11 +73,17 @@ class fill:
         boss_tags = boss_tag.split('-')
 
         if len(param[0]) == 3:
-            pltype = self.play_type(param[0][2])
             ploption = param[0][2]
+            plmiss = 1 if ploption == '閃' else 0
+            pltype = self.play_type(ploption)
+        elif len(param[0]) == 4:
+            ploption = param[0][2]
+            plmiss = 1 if param[0][3] == '閃' else 0
+            pltype = self.play_type(ploption)
         else:
-            pltype = 'normal_play'
             ploption = ''
+            plmiss = 0
+            pltype = 'normal_play'
 
         damage = int(param[0][1])
         column_value = {'user_id':user_id, 'rounds':boss_tags[0], 'boss':boss_tags[1], 'damage':damage}
@@ -80,7 +91,7 @@ class fill:
         if not result:
             return f'{user_nickname} 記錄失敗'
 
-        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1])}
+        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1]), 'missing_play':plmiss}
         db_result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
         if not db_result:
             return f'{user_nickname} 記錄失敗'
@@ -89,7 +100,7 @@ class fill:
         utils.db.sqlur.barrier(description)
 
         plnumber = self.get_played_number(user_id)
-        sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption)
+        sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)
         if not sheet_result:
             return f'{user_nickname} 試算表記錄失敗'
 

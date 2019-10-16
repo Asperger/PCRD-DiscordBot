@@ -104,7 +104,7 @@ def get_player_list():
             player_list[int(row[1])] = row[0]
         return player_list
 
-def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, option=''):
+def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, play_option, play_miss):
     global _undo, _sheet_lock
     _sheet_lock.acquire()
     if player_discord_id not in player_list:
@@ -113,8 +113,8 @@ def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, op
     player_nickname = player_list[player_discord_id]
 
     today = get_settlement_time_object()
-    play_tag = f"{play_number}{'B' if option == '補' else 'A'}"
-    missing_tag = '' if option != '閃' else option
+    play_tag = f"{play_number}{'B' if play_option == '補' else 'A'}"
+    missing_tag = '閃' if play_miss > 0 else ''
     body = {
         'values': [
             [
