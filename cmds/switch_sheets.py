@@ -27,7 +27,7 @@ class switch_sheets:
         start_date = sheet.get_start_date()
         player_list = sheet.get_player_list()
         if start_date and player_list:
-            return f'試算表已切換為ID: {param[0][0]}'
+            return f'試算表已切換為ID: {param[0][0]}\n公會戰開始日期: {start_date.strftime("%Y/%m/%d")}'
         else:
             sheet.switch_sheets(old_id)
             sheet.get_start_date()

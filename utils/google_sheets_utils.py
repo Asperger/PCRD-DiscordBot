@@ -206,15 +206,15 @@ if __name__ == '__main__':
     switch_sheets('1f3lGlsbr-nc4k8rNwzw1QRDAoqQhrnzXmfY8LMSeNs0')
     print(get_start_date())
     print(get_player_list())
-    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', 1, '6-5', 2856005, '尾')
+    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', 1, '6-5', 2856005, '尾', 0)
     undo()
     redo()
 
-    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '閃'))
+    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '', 1))
     t1u = threading.Thread(target=undo)
     t1r = threading.Thread(target=redo)
 
-    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567))
+    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567, '', 0))
     t2u = threading.Thread(target=undo)
     t2r = threading.Thread(target=redo)
 
