@@ -106,7 +106,6 @@ def get_player_list():
 
 def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, play_option, play_miss):
     global _undo, _sheet_lock
-    _sheet_lock.acquire()
     if player_discord_id not in player_list:
         FileLogger.warn(f'Discord ID: {player_discord_id} not found in sheet')
         return False
@@ -122,30 +121,27 @@ def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, pl
             ]
         ]
     }
-
     play_day_offset = today - start_date
     range_name = f'Day {play_day_offset.days + 1}-Log!A2:F'
+
+    _sheet_lock.acquire()
     result = append_sheet(range_name, body)
+    _sheet_lock.release()
 
-    updates = result.get('updates')
-    if not updates:
-        FileLogger.error(f'Fail to write sheet: {description}')
-        return False
-
-    updated_range = updates.get('updatedRange')
-    if updated_range:
+    checkResult = True
+    try:
+        updates = result.get('updates')
+        updated_range = updates.get('updatedRange')
         _undo['undostack'].append([updated_range, body, description])
         _undo['redostack'] = []
-        _sheet_lock.release()
-        return True
-    else:
-        FileLogger.error(f'Fail to write sheet: {description}')
-        _sheet_lock.release()
-        return False
+    except Exception as e:
+        FileLogger.error(f'Fail to get result: {description}\n'+ str(e))
+        checkResult = False
+
+    return checkResult
 
 def undo():
     global _undo, _sheet_lock
-    _sheet_lock.acquire()
     op = _undo['undostack'][-1]
     _undo['undostack'] = _undo['undostack'][0:-1]
     (range_name, body, description) = op
@@ -157,35 +153,43 @@ def undo():
             ]
         ]
     }
-    result = write_sheet(range_name, empty_body)
 
-    updated_range = result.get('updatedRange')
+    _sheet_lock.acquire()
+    result = write_sheet(range_name, empty_body)
+    _sheet_lock.release()
+
+    try:
+        updated_range = result.get('updatedRange')
+    except Exception as e:
+        FileLogger.error(f'Fail to get undo result: {description}\n'+ str(e))
+
     if updated_range and range_name == updated_range:
         _undo['redostack'].append([updated_range, body, description])
-        _sheet_lock.release()
         return description
     else:
         FileLogger.error(f'Inconsistent undo result: {description}')
-        _sheet_lock.release()
         return None
 
 def redo():
     global _undo, _sheet_lock
-    _sheet_lock.acquire()
     op = _undo['redostack'][-1]
     _undo['redostack'] = _undo['redostack'][0:-1]
     (range_name, body, description) = op
 
+    _sheet_lock.acquire()
     result = write_sheet(range_name, body)
+    _sheet_lock.release()
 
-    updated_range = result.get('updatedRange')
+    try:
+        updated_range = result.get('updatedRange')
+    except Exception as e:
+        FileLogger.error(f'Fail to get redo result: {description}\n'+ str(e))
+
     if updated_range and range_name == updated_range:
         _undo['undostack'].append([updated_range, body, description])
-        _sheet_lock.release()
         return description
     else:
         FileLogger.error(f'Inconsistent redo result: {description}')
-        _sheet_lock.release()
         return None
 
 def column_number_to_letter(input_column_number):
