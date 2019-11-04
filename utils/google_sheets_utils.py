@@ -38,6 +38,7 @@ service = build('sheets', 'v4', credentials=creds)
 spreadsheet_id = ''
 start_date = datetime.now()
 player_list = {}
+
 _undo = {}
 _undo['undostack'] = []
 _undo['redostack'] = []
@@ -46,10 +47,6 @@ _sheet_lock = threading.RLock()
 def get_sheets_id():
     global spreadsheet_id
     return spreadsheet_id
-
-def switch_sheets(sheet_id):
-    global spreadsheet_id
-    spreadsheet_id = sheet_id
 
 def read_sheet(range_name):
     try:
@@ -103,6 +100,17 @@ def get_player_list():
         for row in values:
             player_list[int(row[1])] = row[0]
         return player_list
+
+def switch_sheets(sheet_id):
+    global spreadsheet_id
+    spreadsheet_id = sheet_id
+    start_date = get_start_date()
+    player_list = get_player_list()
+
+    with open('sheet.id', 'w') as f:
+        f.write(spreadsheet_id)
+
+    return spreadsheet_id, start_date, player_list
 
 def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, play_option, play_miss):
     global _undo, _sheet_lock
@@ -192,20 +200,13 @@ def redo():
         FileLogger.error(f'Inconsistent redo result: {description}')
         return None
 
-def column_number_to_letter(input_column_number):
-    output_column_name = ""
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    base = len(chars)
-    temp = input_column_number
-    while temp > 0:
-        position = temp % base
-        output_column_name = ('Z' if position == 0 else chars[position - 1 if position > 0 else 0]) + output_column_name
-        temp = (temp - 1) // base
-    return output_column_name
+# The file sheet.id stores the id of a specific google sheet, and is
+# created automatically when the switching happens.
+if os.path.exists('sheet.id'):
+    with open('sheet.id', 'r') as f:
+        switch_sheets(f.read())
 
 if __name__ == '__main__':
-    assert(column_number_to_letter(89) == 'CK')
-    assert(column_number_to_letter(78) == 'BZ')
     #switch_sheets('1eucoItgkCSRhV46XKqMEGmNG_5Ob6Es2O60ordUc-_4')
     switch_sheets('1f3lGlsbr-nc4k8rNwzw1QRDAoqQhrnzXmfY8LMSeNs0')
     print(get_start_date())

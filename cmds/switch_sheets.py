@@ -23,13 +23,9 @@ class switch_sheets:
             return '只有公會的管理員才能使用這個功能'
 
         old_id = sheet.get_sheets_id()
-        sheet.switch_sheets(param[0][0])
-        start_date = sheet.get_start_date()
-        player_list = sheet.get_player_list()
+        (new_id, start_date, player_list) = sheet.switch_sheets(param[0][0])
         if start_date and player_list:
-            return f'試算表已切換為ID: {param[0][0]}\n公會戰開始日期: {start_date.strftime("%Y/%m/%d")}'
+            return f'試算表已切換為ID: {new_id}\n公會戰開始日期: {start_date.strftime("%Y/%m/%d")}'
         else:
             sheet.switch_sheets(old_id)
-            sheet.get_start_date()
-            sheet.get_player_list()
-            return f'試算表ID: {param[0][0]} 錯誤或試算表格式不對'
+            return f'試算表ID: {new_id} 錯誤或試算表格式不對'

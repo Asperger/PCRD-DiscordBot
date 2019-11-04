@@ -8,3 +8,4 @@ logs/
 *.sqlite3
 *.json
 token.pickle
+sheet.id
