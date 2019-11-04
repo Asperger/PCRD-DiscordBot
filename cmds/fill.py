@@ -86,6 +86,13 @@ class fill:
             pltype = 'normal_play'
 
         damage = int(param[0][1])
+        description = f'{user_nickname} fill {" ".join(param[0])}'
+
+        plnumber = self.get_played_number(user_id) + 1
+        sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)
+        if not sheet_result:
+            return f'{user_nickname} 試算表記錄失敗'
+
         column_value = {'user_id':user_id, 'rounds':boss_tags[0], 'boss':boss_tags[1], 'damage':damage}
         result = utils.db.insert('TimeTable', column_value)
         if not result:
@@ -96,13 +103,7 @@ class fill:
         if not db_result:
             return f'{user_nickname} 記錄失敗'
 
-        description = f'{user_nickname} fill {" ".join(param[0])}'
         utils.db.sqlur.barrier(description)
-
-        plnumber = self.get_played_number(user_id)
-        sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)
-        if not sheet_result:
-            return f'{user_nickname} 試算表記錄失敗'
 
         return f'{user_nickname} 記錄成功'
 
