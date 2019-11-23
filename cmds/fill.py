@@ -50,7 +50,7 @@ class fill:
         where = f"play_date='{date}' AND user_id={user_id}"
         result = utils.db.query('UserTable', where)
         if result:
-            return result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play'])
+            return result[0]['normal_play'] + result[0]['compensate_play']
         else:
             return 0
 
