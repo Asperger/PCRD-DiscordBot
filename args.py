@@ -5,6 +5,8 @@ from cmds.undo import undo
 from cmds.redo import redo
 from cmds.ping import ping
 from cmds.lineup import lineup
+from cmds.lineoff import lineoff
+from cmds.set_line import set_line
 from cmds.switch_sheets import switch_sheets
 
 from utils.log import FileLogger
@@ -20,6 +22,10 @@ cmds_registry = {
     "redo": "redo",
     "ping": "ping",
     "+1": "lineup",
+    "lineup": "lineup",
+    "-1": "lineoff",
+    "lineoff": "lineoff",
+    "set_line": "set_line",
     "switch_sheets": "switch_sheets"
 }
 

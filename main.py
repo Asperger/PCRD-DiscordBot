@@ -29,7 +29,8 @@ async def on_message(message):
         user_auth = {
             'guild_id': message.author.guild.id,
             'user_id': message.author.id,
-            'user_admin': message.author.guild_permissions.administrator
+            'user_admin': message.author.guild_permissions.administrator,
+            'channel_id': message.channel.id
         }
         msg = parse_args(user_auth, message.content[1:])
         if msg:

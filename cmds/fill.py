@@ -4,6 +4,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir) 
 import utils.db
 from utils.log import FileLogger
+from utils.line_manager import line_off
 from utils.timer import get_settlement_time
 from utils.guild_member import get_guild_member_nickname
 from utils.google_sheets_utils import fill_sheet
@@ -104,7 +105,7 @@ class fill:
             return f'{user_nickname} 記錄失敗'
 
         utils.db.sqlur.barrier(description)
-
+        line_off(guild_id, user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
 
 if __name__ == '__main__':

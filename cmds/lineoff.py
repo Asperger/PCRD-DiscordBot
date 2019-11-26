@@ -6,9 +6,9 @@ from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
 import utils.line_manager as line_manager
 
-class lineup:
+class lineoff:
     def __init__(self):
-        self.usage = '!+1'
+        self.usage = '!-1'
 
     def run(self, user_auth, *param):
         guild_id = user_auth['guild_id']
@@ -23,8 +23,8 @@ class lineup:
             return self.usage
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        result = line_manager.line_up(guild_id, user_id, boss_id)
+        result = line_manager.line_off(guild_id, user_id, boss_id)
         if result:
-            return f'{user_nickname} 排隊成功'
+            return f'{user_nickname} 取消排隊成功'
         else:
-            return f'{user_nickname} 排隊失敗'
+            return f'{user_nickname} 取消排隊失敗'
