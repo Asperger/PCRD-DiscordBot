@@ -7,7 +7,7 @@ import utils.line_manager as line_manager
 
 class set_line:
     def __init__(self):
-        self.usage = '!set_line <幾王> <幾刀>\n刀數為0代表不限人數'
+        self.usage = '!set_line <幾王> <人數>\n人數為0代表不限'
 
     def run(self, user_auth, *param):
         if param and len(param[0]) != 2:
