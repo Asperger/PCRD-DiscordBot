@@ -7,6 +7,7 @@ from cmds.ping import ping
 from cmds.lineup import lineup
 from cmds.lineoff import lineoff
 from cmds.set_line import set_line
+from cmds.clear_line import clear_line
 from cmds.switch_sheets import switch_sheets
 
 from utils.log import FileLogger
@@ -26,6 +27,7 @@ cmds_registry = {
     "-1": "lineoff",
     "lineoff": "lineoff",
     "set_line": "set_line",
+    "clear_line": "clear_line",
     "switch_sheets": "switch_sheets"
 }
 

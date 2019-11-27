@@ -2,31 +2,16 @@ import operator
 import time
 
 guild_lines = {}
-line_record = {
-    1: {
-        "amount": 0,
-        "player_ids": {}
-    },
-    2: {
-        "amount": 0,
-        "player_ids": {}
-    },
-    3: {
-        "amount": 0,
-        "player_ids": {}
-    },
-    4: {
-        "amount": 0,
-        "player_ids": {}
-    },
-    5: {
-        "amount": 0,
-        "player_ids": {}
-    },
-}
+
+def clear(guild_id):
+    global guild_lines
+    if (guild_id in guild_lines):
+        del guild_lines[guild_id]
+        return True
+    else:
+        return False
 
 def check_guild_lines(guild_id, boss_id):
-    global guild_lines
     if (guild_id not in guild_lines):
         return False
     if (boss_id not in guild_lines[guild_id]):
@@ -34,9 +19,30 @@ def check_guild_lines(guild_id, boss_id):
     return True
 
 def set_guild_lines(guild_id, boss_id):
-    global guild_lines, line_record
+    global guild_lines
     if (guild_id not in guild_lines):
-        guild_lines[guild_id] = line_record
+        guild_lines[guild_id] = {
+            1: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            2: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            3: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            4: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            5: {
+                "amount": 0,
+                "player_ids": {}
+            },
+        }
     if (boss_id not in guild_lines[guild_id]):
         return False
     return True
@@ -71,15 +77,28 @@ def set_line(guild_id, boss_id, amount):
     guild_lines[guild_id][boss_id]["amount"] = amount
     return True
 
-def get_line(guild_id, boss_id):
-    global guild_lines
+def get_line(guild_id, boss_id, offset):
     if not check_guild_lines(guild_id, boss_id):
         return None
 
     amount = guild_lines[guild_id][boss_id]["amount"]
     sorted_line = sorted(guild_lines[guild_id][boss_id]["player_ids"].items(), key=operator.itemgetter(1))
     sorted_players = list(map(lambda x: x[0], sorted_line))
-    if (amount > 0):
-        return sorted_players[:amount]
+    if amount > 0:
+        if offset > 0:
+            return sorted_players[amount:amount+offset]
+        else:
+            return sorted_players[:amount]
     else:
         return sorted_players
+
+if __name__ == '__main__':
+    guild_id, boss_id = 123, 1
+    set_line(guild_id, boss_id, 3)
+    line_up(guild_id, 100001, boss_id)
+    line_up(guild_id, 100002, boss_id)
+    line_up(guild_id, 100003, boss_id)
+    line_up(guild_id, 100004, boss_id)
+    line_up(guild_id, 100005, boss_id)
+    print(get_line(guild_id, boss_id, 0))
+    print(get_line(guild_id, boss_id, 1))

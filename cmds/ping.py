@@ -8,7 +8,7 @@ import utils.line_manager as line_manager
 
 class ping:
     def __init__(self):
-        self.usage = '!ping'
+        self.usage = '!ping [人數]'
 
     def run(self, user_auth, *param):
         guild_id = user_auth['guild_id']
@@ -18,11 +18,17 @@ class ping:
         user_nickname = get_guild_member_nickname(guild_id, user_id)
         if not user_nickname:
             return '你不是這個公會的隊員吧?'
-        if param and len(param[0]) > 0:
+        if param and len(param[0]) > 1:
             return self.usage
+        offset = 0
+        if len(param[0]) == 1:
+            if param[0][0].isdigit() and int(param[0][0]) > 0:
+                offset = int(param[0][0])
+            else:
+                return self.usage
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        players = line_manager.get_line(guild_id, boss_id)
+        players = line_manager.get_line(guild_id, boss_id, offset)
 
         if players:
             result = ''
