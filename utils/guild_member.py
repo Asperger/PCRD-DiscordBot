@@ -48,6 +48,10 @@ def get_guild_member_list(guild_id):
     return set(guild_member_list[guild_id].keys())
 
 def setup_guild_channel_list(guild):
+    if guild.id in guild_channel_list:
+        elapsed_time = time.time() - utils.timer.timer_channel_list[guild.id]
+        if elapsed_time < 864000:
+            return
     guild_channel_list[guild.id] = {}
     for channel in guild.channels:
         if channel.type.name == 'text' and channel.category.name.endswith('討論區'):
@@ -66,6 +70,7 @@ def setup_guild_channel_list(guild):
             elif channel.name.startswith('五王-'):
                 guild_channel_list[guild.id][5] = channel.id
                 guild_channel_list[guild.id][channel.id] = 5
+    utils.timer.timer_channel_list[guild.id] = time.time()
 
 def get_guild_channel_list(guild_id):
     if guild_id not in guild_channel_list:

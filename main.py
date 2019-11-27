@@ -25,6 +25,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('!'):
+        setup_guild_channel_list(message.author.guild)
         setup_guild_member_list(message.author.guild)
         user_auth = {
             'guild_id': message.author.guild.id,

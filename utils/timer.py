@@ -1,5 +1,6 @@
 timer_usage = 0
 timer_member_list = {}
+timer_channel_list = {}
 
 from datetime import datetime
 from pytz import timezone    
