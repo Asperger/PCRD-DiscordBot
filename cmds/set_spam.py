@@ -9,18 +9,16 @@ from utils.spammer import set_spammer
 class set_spam:
     def __init__(self):
         self.usage = '!set_spam <request> <response>'
+        self.auth_warning = ''
 
     def check_param(self, param):
-        if len(param) != 2:
-            return False
-        else:
-            return True
+        return len(param) == 2
 
-    def run(self, user_auth, *param):
-        if not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        return True
 
-        result = set_spammer(param[0][0], param[0][1])
+    def run(self, user_auth, param):
+        result = set_spammer(param[0], param[1])
         if result:
             return '嘿嘿'
         else:

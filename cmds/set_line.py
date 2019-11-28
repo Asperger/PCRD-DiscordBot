@@ -8,15 +8,17 @@ import utils.line_manager as line_manager
 class set_line:
     def __init__(self):
         self.usage = '!set_line <幾王> <人數>\n人數為0代表不限'
+        self.auth_warning = '只有公會的管理員才能使用這個功能'
 
-    def run(self, user_auth, *param):
-        if param and len(param[0]) != 2:
-            return self.usage
-        if not user_auth['user_admin']:
-            return '只有公會的管理員才能使用這個功能'
+    def check_param(self, param):
+        return param and len(param) == 2
 
-        boss_id = int(param[0][0])
-        amount = int(param[0][1])
+    def check_auth(self, auth):
+        return auth['user_admin']
+
+    def run(self, user_auth, param):
+        boss_id = int(param[0])
+        amount = int(param[1])
         result = line_manager.set_line(user_auth['guild_id'], boss_id, amount)
         if result:
             if amount < 1:

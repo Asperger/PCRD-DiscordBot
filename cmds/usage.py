@@ -10,17 +10,15 @@ import utils.timer
 class usage:
     def __init__(self):
         self.usage = '!help'
+        self.auth_warning = ''
 
     def check_param(self, param):
-        if len(param) != 0:
-            return False
-        else:
-            return True
+        return len(param) == 0
 
-    def run(self, user_auth, *param):
-        if not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        return True
 
+    def run(self, user_auth, param):
         elapsed_time = time.time() - utils.timer.timer_usage
         if elapsed_time < 30:
             return '肚子餓了...'

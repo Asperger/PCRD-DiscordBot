@@ -9,18 +9,24 @@ import utils.line_manager as line_manager
 class lineup:
     def __init__(self):
         self.usage = '!+1'
+        self.auth_warning = '你不是這個公會的隊員吧?'
 
-    def run(self, user_auth, *param):
+    def check_param(self, param):
+        return not param
+
+    def check_auth(self, auth):
+        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        if user_nickname:
+            return True
+        else:
+            return False
+
+    def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
         channel_id = user_auth['channel_id']
 
         user_nickname = get_guild_member_nickname(guild_id, user_id)
-        if not user_nickname:
-            return '你不是這個公會的隊員吧?'
-
-        if param and len(param[0]) == 1 and param[0][0] == 'help':
-            return self.usage
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
         result = line_manager.line_up(guild_id, user_id, boss_id)

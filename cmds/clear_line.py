@@ -8,13 +8,15 @@ import utils.line_manager as line_manager
 class clear_line:
     def __init__(self):
         self.usage = '!clear_line'
+        self.auth_warning = '你不是這個公會的隊員吧?'
+
+    def check_param(self, param):
+        return not param
+
+    def check_auth(self, auth):
+        return auth['user_admin']
 
     def run(self, user_auth, *param):
-        if param and len(param[0]) != 0:
-            return self.usage
-        if not user_auth['user_admin']:
-            return '只有公會的管理員才能使用這個功能'
-
         result = line_manager.clear(user_auth['guild_id'])
         if result:
             return '排隊記錄清除成功'

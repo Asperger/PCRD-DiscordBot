@@ -9,18 +9,16 @@ from utils.spammer import clear_spammer
 class clear_spam:
     def __init__(self):
         self.usage = '!clear_spam <request>'
+        self.auth_warning = '只有公會的管理員才能使用這個功能'
 
     def check_param(self, param):
-        if len(param) != 1:
-            return False
-        else:
-            return True
+        return len(param) == 1
 
-    def run(self, user_auth, *param):
-        if not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        return auth['user_admin']
 
-        result = clear_spammer(param[0][0])
+    def run(self, user_auth, param):
+        result = clear_spammer(param[0])
         if result:
             return '指令清除成功'
         else:

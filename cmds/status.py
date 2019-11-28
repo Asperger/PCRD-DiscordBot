@@ -12,6 +12,7 @@ import datetime
 class status:
     def __init__(self):
         self.usage = '!status [all] [YYYY-MM-DD]'
+        self.auth_warning = '你不是這個公會的隊員吧?'
         self.date = utils.timer.get_settlement_time()
         self.all_user = False
 
@@ -29,13 +30,17 @@ class status:
                 self.date = p
         return True
 
-    def run(self, user_auth, *param):
-        if not param or len(param[0]) == 0:
-            pass
-        elif not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        if user_nickname:
+            return True
+        else:
+            return False
+
+    def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
+
         where = f"play_date='{self.date}'"
         if not self.all_user:
             where += f' AND user_id={user_id}'
@@ -74,10 +79,7 @@ class status:
                 report += f'{unattend}未出刀'
         elif not report:
             author_nickname = get_guild_member_nickname(guild_id, user_id)
-            if author_nickname:
-                report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
-            else:
-                report = '你不是這個公會的隊員吧?'
+            report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
         return report
 

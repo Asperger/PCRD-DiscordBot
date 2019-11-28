@@ -12,6 +12,7 @@ from utils.google_sheets_utils import fill_sheet
 class fill:
     def __init__(self):
         self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補] [閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'
+        self.auth_warning = '你不是這個公會的隊員吧?'
 
     def play_type(self, x):
         return {
@@ -46,6 +47,13 @@ class fill:
 
         return True
 
+    def check_auth(self, auth):
+        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        if user_nickname:
+            return True
+        else:
+            return False
+
     def get_played_number(self, user_id):
         date = get_settlement_time()
         where = f"play_date='{date}' AND user_id={user_id}"
@@ -55,39 +63,30 @@ class fill:
         else:
             return 0
 
-    def run(self, user_auth, *param):
+    def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
 
         user_nickname = get_guild_member_nickname(guild_id, user_id)
-        if not user_nickname:
-            return '你不是這個公會的隊員吧?'
 
-        if not param or len(param[0]) == 0:
-            return self.usage
-        if param[0][0] == 'help':
-            return self.usage
-        if not self.check_param(param[0]):
-            return self.usage
-
-        boss_tag = param[0][0]
+        boss_tag = param[0]
         boss_tags = boss_tag.split('-')
 
-        if len(param[0]) == 3:
-            ploption = param[0][2]
+        if len(param) == 3:
+            ploption = param[2]
             plmiss = 1 if ploption == '閃' else 0
             pltype = self.play_type(ploption)
-        elif len(param[0]) == 4:
-            ploption = param[0][2]
-            plmiss = 1 if param[0][3] == '閃' else 0
+        elif len(param) == 4:
+            ploption = param[2]
+            plmiss = 1 if param[3] == '閃' else 0
             pltype = self.play_type(ploption)
         else:
             ploption = ''
             plmiss = 0
             pltype = 'normal_play'
 
-        damage = int(param[0][1])
-        description = f'{user_nickname} fill {" ".join(param[0])}'
+        damage = int(param[1])
+        description = f'{user_nickname} fill {" ".join(param)}'
 
         plnumber = self.get_played_number(user_id) + 1
         sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)

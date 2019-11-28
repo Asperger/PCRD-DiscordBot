@@ -5,12 +5,19 @@ from utils.guild_member import get_guild_member_nickname
 class redo:
     def __init__(self):
         self.usage = '!redo'
-    def run(self, user_auth, *param):
-        if param and len(param[0]) > 0:
-            return self.usage
-        user_nickname = get_guild_member_nickname(user_auth['guild_id'], user_auth['user_id'])
-        if not user_nickname:
-            return '你不是這個公會的隊員吧?'
+        self.auth_warning = '你不是這個公會的隊員吧?'
+
+    def check_param(self, param):
+        return not param
+
+    def check_auth(self, auth):
+        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        if user_nickname:
+            return True
+        else:
+            return False
+
+    def run(self, user_auth, param):
         try:
             description = utils.db.sqlur.redo()
             utils.google_sheets_utils.redo()

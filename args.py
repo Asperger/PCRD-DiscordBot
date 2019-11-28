@@ -41,12 +41,11 @@ def parse_args(user_auth, string):
     args = string.split()
     response = ''
 
-    # Find command
+    # Find command, otherwise consider it as spam
     cmd = "spam"
     if args[0] in cmds_registry:
         cmd = cmds_registry[args[0]]
-    else:
-        args = ["spam"] + args
+        args = args[1:]
 
     # Create the instance
     try:
@@ -59,9 +58,14 @@ def parse_args(user_auth, string):
         FileLogger.exception(f'Exception at {__file__} {__name__}')
     
     # Execute the function
-    FileLogger.info(f"{user_auth['user_id']} call {args[0]} with {args[1:]}")
+    FileLogger.info(f"{user_auth['user_id']} call {cmd} with {args}")
     try:
-        response = inst.run(user_auth, args[1:])
+        if not inst.check_param(args):
+            response = inst.usage
+        elif not inst.check_auth(user_auth):
+            response = inst.auth_warning
+        else:
+            response = inst.run(user_auth, args)
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')
 

@@ -9,15 +9,13 @@ from utils.spammer import get_spammer
 class spam:
     def __init__(self):
         self.usage = '!spam <request>'
+        self.auth_warning = ''
 
     def check_param(self, param):
-        if len(param) != 1:
-            return False
-        else:
-            return True
+        return len(param) == 1
 
-    def run(self, user_auth, *param):
-        if not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        return True
 
-        return get_spammer(param[0][0])
+    def run(self, user_auth, param):
+        return get_spammer(param[0])
