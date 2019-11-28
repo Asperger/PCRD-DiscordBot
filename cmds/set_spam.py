@@ -8,7 +8,7 @@ from utils.spammer import set_spammer
 
 class set_spam:
     def __init__(self):
-        self.usage = '!set_spam <request> <response>'
+        self.usage = '!set_spam <你的指令> <佩可的反應>\n設定完成後在指令前加上驚嘆號即可使用\n指令也可以是特殊符號或表情符號\n反應也可以是特殊符號、表情符號、圖片或圖片的網址'
         self.auth_warning = ''
 
     def check_param(self, param):

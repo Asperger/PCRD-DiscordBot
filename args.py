@@ -60,7 +60,9 @@ def parse_args(user_auth, string):
     # Execute the function
     FileLogger.info(f"{user_auth['user_id']} call {cmd} with {args}")
     try:
-        if not inst.check_param(args):
+        if len(args) == 1 and args[0] == 'help':
+            response = inst.usage
+        elif not inst.check_param(args):
             response = inst.usage
         elif not inst.check_auth(user_auth):
             response = inst.auth_warning

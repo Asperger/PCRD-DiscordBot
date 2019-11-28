@@ -58,6 +58,7 @@ async def on_message(message):
                 for i in range(len(msg)):
                     await message.channel.send(msg[i])
             elif is_url(msg):
+                # it's an url
                 embed = discord.Embed()
                 embed.set_image(url=msg)
                 await message.channel.send(embed=embed)

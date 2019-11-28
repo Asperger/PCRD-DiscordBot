@@ -8,7 +8,7 @@ from utils.spammer import clear_spammer
 
 class clear_spam:
     def __init__(self):
-        self.usage = '!clear_spam <request>'
+        self.usage = '!clear_spam <指令>'
         self.auth_warning = '只有公會的管理員才能使用這個功能'
 
     def check_param(self, param):
