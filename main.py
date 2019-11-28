@@ -5,6 +5,8 @@ from discord.ext import commands
 import json
 import collections
 import asyncio
+from urllib.parse import urlparse
+
 from utils.log import FileLogger
 
 from utils.token import get_token
@@ -13,6 +15,13 @@ from args import parse_args, usage
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 
 client = discord.Client()
+
+def is_url(x):
+    try:
+        result = urlparse(x)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
 
 @client.event
 async def on_message(message):
@@ -27,13 +36,18 @@ async def on_message(message):
     if message.content.startswith('!'):
         setup_guild_channel_list(message.author.guild)
         setup_guild_member_list(message.author.guild)
+
         user_auth = {
             'guild_id': message.author.guild.id,
             'user_id': message.author.id,
             'user_admin': message.author.guild_permissions.administrator,
             'channel_id': message.channel.id
         }
-        msg = parse_args(user_auth, message.content[1:])
+
+        content = message.content[1:]
+        if message.attachments:
+            content += f' {message.attachments[0].url}'
+        msg = parse_args(user_auth, content)
         if msg:
             if isinstance(msg, collections.Mapping):
                 # it's a dict
@@ -43,6 +57,10 @@ async def on_message(message):
                 # it's a list
                 for i in range(len(msg)):
                     await message.channel.send(msg[i])
+            elif is_url(msg):
+                embed = discord.Embed()
+                embed.set_image(url=msg)
+                await message.channel.send(embed=embed)
             else:
                 await message.channel.send(msg)
 
