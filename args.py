@@ -6,6 +6,9 @@ from cmds.redo import redo
 from cmds.ping import ping
 from cmds.lineup import lineup
 from cmds.lineoff import lineoff
+from cmds.spam import spam
+from cmds.set_spam import set_spam
+from cmds.clear_spam import clear_spam
 from cmds.set_line import set_line
 from cmds.clear_line import clear_line
 from cmds.switch_sheets import switch_sheets
@@ -26,6 +29,9 @@ cmds_registry = {
     "lineup": "lineup",
     "-1": "lineoff",
     "lineoff": "lineoff",
+    "spam": "spam",
+    "set_spam": "set_spam",
+    "clear_spam": "clear_spam",
     "set_line": "set_line",
     "clear_line": "clear_line",
     "switch_sheets": "switch_sheets"
@@ -33,24 +39,33 @@ cmds_registry = {
 
 def parse_args(user_auth, string):
     args = string.split()
+    response = ''
+
+    # Find command
+    cmd = "spam"
+    if args[0] in cmds_registry:
+        cmd = cmds_registry[args[0]]
+    else:
+        args = ["spam"] + args
+
     # Create the instance
     try:
-        inst = globals()[cmds_registry[args[0]]]()
+        inst = globals()[cmd]()
     except KeyError:
         FileLogger.warn(f'No command found')
-        return
     except IndexError:
         FileLogger.warn(f'No command found')
-        return
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')
-        return
+    
     # Execute the function
     FileLogger.info(f"{user_auth['user_id']} call {args[0]} with {args[1:]}")
     try:
-        return inst.run(user_auth, args[1:])
+        response = inst.run(user_auth, args[1:])
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')
+
+    return response
 
 if __name__ == '__main__':
     user_auth = {
