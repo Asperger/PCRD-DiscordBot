@@ -8,7 +8,7 @@ from utils.spammer import get_spammer
 
 class spam:
     def __init__(self):
-        self.usage = '!spam <request>'
+        self.usage = '!spam <你的指令>'
         self.auth_warning = ''
 
     def check_param(self, param):
