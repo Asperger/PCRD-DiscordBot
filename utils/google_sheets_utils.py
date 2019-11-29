@@ -1,10 +1,5 @@
-import os, sys, inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
-
 import pickle
-import os.path
+import os.path as path
 import threading
 from datetime import datetime
 from utils.log import FileLogger
@@ -14,13 +9,15 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 scopes = ['https://www.googleapis.com/auth/spreadsheets']
-creds_path = os.path.join(os.path.dirname(__file__), 'credentials.json')
+creds_path = path.join(path.dirname(__file__), 'credentials.json')
+pickle_path = path.join(path.dirname(__file__), 'token.pickle')
+sheet_id_path = path.join(path.dirname(__file__), 'sheet.id')
 creds = None
 # The file token.pickle stores the user's access and refresh tokens, and is
 # created automatically when the authorization flow completes for the first
 # time.
-if os.path.exists('token.pickle'):
-    with open('token.pickle', 'rb') as token:
+if path.exists(pickle_path):
+    with open(pickle_path, 'rb') as token:
         creds = pickle.load(token)
 # If there are no (valid) credentials available, let the user log in.
 if not creds or not creds.valid:
@@ -30,7 +27,7 @@ if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_secrets_file(creds_path, scopes)
         creds = flow.run_console()
     # Save the credentials for the next run
-    with open('token.pickle', 'wb') as token:
+    with open(pickle_path, 'wb') as token:
         pickle.dump(creds, token)
 
 service = build('sheets', 'v4', credentials=creds)
@@ -107,7 +104,7 @@ def switch_sheets(sheet_id):
     start_date = get_start_date()
     player_list = get_player_list()
 
-    with open('sheet.id', 'w') as f:
+    with open(sheet_id_path, 'w') as f:
         f.write(spreadsheet_id)
 
     return spreadsheet_id, start_date, player_list
@@ -202,8 +199,8 @@ def redo():
 
 # The file sheet.id stores the id of a specific google sheet, and is
 # created automatically when the switching happens.
-if os.path.exists('sheet.id'):
-    with open('sheet.id', 'r') as f:
+if path.exists(sheet_id_path):
+    with open(sheet_id_path, 'r') as f:
         switch_sheets(f.read())
 
 if __name__ == '__main__':

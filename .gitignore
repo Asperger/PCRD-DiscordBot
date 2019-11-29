@@ -2,10 +2,9 @@
 logs/
 *.stackdump
 *.pyc
-*.db
-*.db3
-*.sqlite
-*.sqlite3
-*.json
-token.pickle
-sheet.id
+utils/repo.db
+utils/token.json
+utils/credentials.json
+utils/token.pickle
+utils/sheet.id
+utils/spam.setting

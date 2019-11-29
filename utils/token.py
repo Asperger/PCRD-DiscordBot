@@ -1,9 +1,9 @@
-import os
+import os.path as path
 import json
 
 
 def get_token():
-    token_path = os.path.join(os.path.dirname(__file__), 'token.json')
+    token_path = path.join(path.dirname(__file__), 'token.json')
     with open(token_path) as json_file:
         data = json.load(json_file)
         return data['token']
