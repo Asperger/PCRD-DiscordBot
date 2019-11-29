@@ -17,13 +17,13 @@ class set_line:
         return auth['user_admin']
 
     def run(self, user_auth, param):
+        comment = '設定失敗'
         boss_id = int(param[0])
         amount = int(param[1])
         result = line_manager.set_line(user_auth['guild_id'], boss_id, amount)
         if result:
             if amount < 1:
-                return f'已重設 {boss_id}王:'
+                comment = f'已設定 {boss_id}王: 不限人數'
             else:
-                return f'已設定 {boss_id}王: {amount}刀'
-        else:
-            return f'設定失敗'
+                comment = f'已設定 {boss_id}王: {amount}人'
+        return comment

@@ -3,24 +3,31 @@ import time
 
 guild_lines = {}
 
-def clear(guild_id):
+def clear_line(guild_id, boss_id):
     global guild_lines
-    if (guild_id in guild_lines):
-        del guild_lines[guild_id]
-        return True
+    result = True
+    if guild_id in guild_lines:
+        if boss_id in guild_lines[guild_id]:
+            guild_lines[guild_id][boss_id]["player_ids"] = {}
+        elif boss_id == 0:
+            del guild_lines[guild_id]
+        else:
+            result = False
     else:
-        return False
+        result = False
+    return result
 
 def check_guild_lines(guild_id, boss_id):
-    if (guild_id not in guild_lines):
-        return False
-    if (boss_id not in guild_lines[guild_id]):
-        return False
-    return True
+    result = True
+    if guild_id not in guild_lines:
+        result = False
+    if boss_id not in guild_lines[guild_id]:
+        result = False
+    return result
 
 def set_guild_lines(guild_id, boss_id):
     global guild_lines
-    if (guild_id not in guild_lines):
+    if guild_id not in guild_lines:
         guild_lines[guild_id] = {
             1: {
                 "amount": 0,
@@ -43,9 +50,8 @@ def set_guild_lines(guild_id, boss_id):
                 "player_ids": {}
             },
         }
-    if (boss_id not in guild_lines[guild_id]):
-        return False
-    return True
+
+    return boss_id in guild_lines[guild_id]
 
 def line_up(guild_id, user_id, boss_id):
     global guild_lines
