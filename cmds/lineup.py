@@ -12,7 +12,7 @@ class lineup:
         self.auth_warning = '你不是這個公會的隊員吧?'
 
     def check_param(self, param):
-        return not param
+        return True
 
     def check_auth(self, auth):
         user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])

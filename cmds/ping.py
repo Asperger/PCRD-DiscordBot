@@ -15,7 +15,7 @@ class ping:
     def check_param(self, param):
         if not param:
             return True
-        elif len(param[0]) == 1 and param[0][0].isdigit():
+        elif len(param) == 1 and param[0].isdigit():
             self.base = False
             return True
         else:
@@ -39,9 +39,10 @@ class ping:
         boss_id = get_guild_channel_index(guild_id, channel_id)
         players = line_manager.get_line(guild_id, boss_id, offset)
 
+        result = ''
         if players:
-            result = ''
             for player in players:
                 result += f'<@{player}> '
-            return result
-        return '目前沒有人在排隊'
+        else:
+            result = '目前沒有人在排隊'
+        return result

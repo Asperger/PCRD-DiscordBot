@@ -11,7 +11,7 @@ class set_line:
         self.auth_warning = '只有公會的管理員才能使用這個功能'
 
     def check_param(self, param):
-        return param and len(param) == 2
+        return len(param) == 2 and param[0].isdigit() and param[1].isdigit()
 
     def check_auth(self, auth):
         return auth['user_admin']
