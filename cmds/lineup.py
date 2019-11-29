@@ -8,7 +8,7 @@ import utils.line_manager as line_manager
 
 class lineup:
     def __init__(self):
-        self.usage = '!+1'
+        self.usage = '!+1 [備註]\n備註沒有作用，你可以隨便寫或不寫，例如你要用的隊伍或一些幹話'
         self.auth_warning = '你不是這個公會的隊員吧?'
 
     def check_param(self, param):

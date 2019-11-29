@@ -8,11 +8,11 @@ from utils.spammer import get_spammer
 
 class spam:
     def __init__(self):
-        self.usage = '!spam <你的指令>'
+        self.usage = '!spam <你的指令> 或 !<你的指令>'
         self.auth_warning = ''
 
     def check_param(self, param):
-        return len(param) == 1
+        return len(param) > 0
 
     def check_auth(self, auth):
         return True

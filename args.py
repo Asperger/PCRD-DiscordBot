@@ -20,6 +20,7 @@ import utils.timer
 cmds_registry = {
     "help": "usage",
     "usage": "usage",
+    "f": "fill",
     "fill": "fill",
     "status": "status",
     "undo": "undo",
@@ -30,7 +31,9 @@ cmds_registry = {
     "-1": "lineoff",
     "lineoff": "lineoff",
     "spam": "spam",
+    "ss": "set_spam",
     "set_spam": "set_spam",
+    "cs": "clear_spam",
     "clear_spam": "clear_spam",
     "set_line": "set_line",
     "clear_line": "clear_line",
