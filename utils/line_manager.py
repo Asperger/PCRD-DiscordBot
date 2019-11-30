@@ -5,25 +5,23 @@ guild_lines = {}
 
 def clear_line(guild_id, boss_id):
     global guild_lines
-    result = True
     if guild_id in guild_lines:
         if boss_id in guild_lines[guild_id]:
             guild_lines[guild_id][boss_id]["player_ids"] = {}
         elif boss_id == 0:
             del guild_lines[guild_id]
         else:
-            result = False
+            return False
     else:
-        result = False
-    return result
+        return False
+    return True
 
 def check_guild_lines(guild_id, boss_id):
-    result = True
     if guild_id not in guild_lines:
-        result = False
+        return False
     if boss_id not in guild_lines[guild_id]:
-        result = False
-    return result
+        return False
+    return True
 
 def set_guild_lines(guild_id, boss_id):
     global guild_lines
