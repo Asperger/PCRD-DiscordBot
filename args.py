@@ -43,6 +43,8 @@ cmds_registry = {
 def parse_args(user_auth, string):
     args = string.split()
     response = ''
+    if not args:
+        return response
 
     # Find command, otherwise consider it as spam
     cmd = "spam"
