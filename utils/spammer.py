@@ -9,7 +9,7 @@ spam_lock = threading.Lock()
 spam_limit = 5
 
 if path.exists(spam_setting_path):
-    with open(spam_setting_path, 'r') as f:
+    with open(spam_setting_path, 'r', encoding="utf-8") as f:
         spam_setting_str = f.read()
         if spam_setting_str:
             try:
@@ -20,7 +20,7 @@ if path.exists(spam_setting_path):
 
 def backup():
     with spam_lock:
-        with open(spam_setting_path, 'w') as f:
+        with open(spam_setting_path, 'w', encoding="utf-8") as f:
             try:
                 f.write(repr(spam_setting))
             except Exception as e:
