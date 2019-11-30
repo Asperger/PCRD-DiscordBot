@@ -9,6 +9,7 @@ from cmds.lineoff import lineoff
 from cmds.spam import spam
 from cmds.set_spam import set_spam
 from cmds.clear_spam import clear_spam
+from cmds.list_spam import list_spam
 from cmds.set_line import set_line
 from cmds.clear_line import clear_line
 from cmds.switch_sheets import switch_sheets
@@ -35,6 +36,8 @@ cmds_registry = {
     "set_spam": "set_spam",
     "cs": "clear_spam",
     "clear_spam": "clear_spam",
+    "ls": "list_spam",
+    "list_spam": "list_spam",
     "set_line": "set_line",
     "clear_line": "clear_line",
     "switch_sheets": "switch_sheets"

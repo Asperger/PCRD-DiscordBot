@@ -69,3 +69,14 @@ def get_spammer(request):
             result = spam_setting[request]["list"][index]
 
     return result
+
+def list_spammer(request):
+    result = {}
+    with spam_lock:
+        if request:
+            if request in spam_setting:
+                result[request] = len(spam_setting[request]["list"])
+        else:
+            for key in spam_setting:
+                result[key] = len(spam_setting[key]["list"])
+    return result
