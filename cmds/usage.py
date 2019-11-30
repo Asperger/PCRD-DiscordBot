@@ -36,6 +36,7 @@ class usage:
 `!set_line` 指定各BOSS需要的人數，僅限公會管理員使用
 `!clear_line` 清空所有排隊紀錄，僅限公會管理員使用
 次要功能:
+`!list_spam`或`!ls` 列出目前佩可的反應
 `!set_spam`或`!ss` 增加佩可的反應
 `!clear_spam`或`!cs` 移除佩可的反應，僅限公會管理員使用
 `!help` 重看這篇說明
