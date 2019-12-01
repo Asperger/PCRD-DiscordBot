@@ -10,7 +10,8 @@ from urllib.parse import urlparse
 from utils.log import FileLogger
 
 from utils.token import get_token
-from args import parse_args, usage
+from args import parse_args
+from cmds.usage import usage
 
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 
@@ -70,7 +71,7 @@ async def on_member_join(member):
     if not member.bot:
         for channel in member.guild.channels:
             if channel.name == '公會大廳':
-                await channel.send(f':grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage()}')
+                await channel.send(f':grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage().run({}, [])}')
 
 @client.event
 async def on_ready():
