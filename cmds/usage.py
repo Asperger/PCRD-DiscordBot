@@ -38,7 +38,7 @@ class usage:
 次要功能:
 `!list_spam`或`!ls` 列出目前佩可的反應
 `!set_spam`或`!ss` 增加佩可的反應
-`!set_spam_weight`或`!ssw` 設定各個反應的權重
+`!set_spam_weight`或`!ssw` 設定各個反應的權重，僅限公會管理員使用
 `!clear_spam`或`!cs` 移除佩可的反應，僅限公會管理員使用
 `!help` 重看這篇說明
 在各個指令之後加上 `help` 查看使用格式

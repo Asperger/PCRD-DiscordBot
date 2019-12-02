@@ -30,6 +30,6 @@ class clear_spam:
     def run(self, user_auth, param):
         result = clear_spammer(param[0], self.mode)
         if result:
-            return '指令清除成功'
+            return f'{param[0]} 指令清除成功'
         else:
-            return '指令清除失敗'
+            return f'{param[0]} 指令清除失敗'
