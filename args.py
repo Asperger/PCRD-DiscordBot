@@ -8,6 +8,7 @@ from cmds.lineup import lineup
 from cmds.lineoff import lineoff
 from cmds.spam import spam
 from cmds.set_spam import set_spam
+from cmds.set_spam_weight import set_spam_weight
 from cmds.clear_spam import clear_spam
 from cmds.list_spam import list_spam
 from cmds.set_line import set_line
@@ -34,6 +35,8 @@ cmds_registry = {
     "spam": "spam",
     "ss": "set_spam",
     "set_spam": "set_spam",
+    "ssw": "set_spam_weight",
+    "set_spam_weight": "set_spam_weight",
     "cs": "clear_spam",
     "clear_spam": "clear_spam",
     "ls": "list_spam",
