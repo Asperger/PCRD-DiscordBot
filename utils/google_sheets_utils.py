@@ -1,6 +1,6 @@
-import pickle
-import os.path as path
-import threading
+from pickle import load, dump
+from os.path import exists, dirname, join
+from threading import Thread, RLock
 from datetime import datetime
 from utils.log import FileLogger
 from utils.timer import get_settlement_time_object
@@ -9,16 +9,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 _scopes = ['https://www.googleapis.com/auth/spreadsheets']
-_creds_path = path.join(path.dirname(__file__), 'credentials.json')
-_pickle_path = path.join(path.dirname(__file__), 'token.pickle')
-_sheet_id_path = path.join(path.dirname(__file__), 'sheet.id')
+_creds_path = join(dirname(__file__), 'credentials.json')
+_pickle_path = join(dirname(__file__), 'token.pickle')
+_sheet_id_path = join(dirname(__file__), 'sheet.id')
 _creds = None
 # The file token.pickle stores the user's access and refresh tokens, and is
 # created automatically when the authorization flow completes for the first
 # time.
-if path.exists(_pickle_path):
+if exists(_pickle_path):
     with open(_pickle_path, 'rb') as token:
-        _creds = pickle.load(token)
+        _creds = load(token)
 # If there are no (valid) credentials available, let the user log in.
 if not _creds or not _creds.valid:
     if _creds and _creds.expired and _creds.refresh_token:
@@ -28,7 +28,7 @@ if not _creds or not _creds.valid:
         _creds = flow.run_console()
     # Save the credentials for the next run
     with open(_pickle_path, 'wb') as token:
-        pickle.dump(_creds, token)
+        dump(_creds, token)
 
 _service = build('sheets', 'v4', credentials=_creds)
 
@@ -39,7 +39,7 @@ _player_list = {}
 _undo = {}
 _undo['undostack'] = []
 _undo['redostack'] = []
-_sheet_lock = threading.RLock()
+_sheet_lock = RLock()
 
 def get_sheets_id():
     global _spreadsheet_id
@@ -199,7 +199,7 @@ def redo():
 
 # The file sheet.id stores the id of a specific google sheet, and is
 # created automatically when the switching happens.
-if path.exists(_sheet_id_path):
+if exists(_sheet_id_path):
     with open(_sheet_id_path, 'r') as f:
         switch_sheets(f.read())
 
@@ -212,13 +212,13 @@ if __name__ == '__main__':
     undo()
     redo()
 
-    t1f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '', 1))
-    t1u = threading.Thread(target=undo)
-    t1r = threading.Thread(target=redo)
+    t1f = Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '', 1))
+    t1u = Thread(target=undo)
+    t1r = Thread(target=redo)
 
-    t2f = threading.Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567, '', 0))
-    t2u = threading.Thread(target=undo)
-    t2r = threading.Thread(target=redo)
+    t2f = Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567, '', 0))
+    t2u = Thread(target=undo)
+    t2r = Thread(target=redo)
 
     t1f.start()
     t1u.start()

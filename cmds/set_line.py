@@ -1,5 +1,5 @@
 from utils.log import FileLogger
-import utils.line_manager as line_manager
+from utils.line_manager import set_line as _set_line
 
 from utils.cmds_registry import register
 register(cmd="set_line", alias="set_line")
@@ -19,7 +19,7 @@ class set_line:
         comment = '設定失敗'
         boss_id = int(param[0])
         amount = int(param[1])
-        result = line_manager.set_line(user_auth['guild_id'], boss_id, amount)
+        result = _set_line(user_auth['guild_id'], boss_id, amount)
         if result:
             if amount < 1:
                 comment = f'已設定 {boss_id}王: 不限人數'

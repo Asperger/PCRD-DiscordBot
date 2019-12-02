@@ -1,13 +1,14 @@
-import time
-import utils.timer
+from time import time
+from utils.timer import timer_member_list, timer_channel_list
 from utils.log import FileLogger
 
 _guild_member_list = {}
 _guild_channel_list = {}
 
 def setup_guild_member_list(guild):
+    global timer_member_list
     if guild.id in _guild_member_list:
-        elapsed_time = time.time() - utils.timer.timer_member_list[guild.id]
+        elapsed_time = time() - timer_member_list[guild.id]
         if elapsed_time < 86400:
             return
     _guild_member_list[guild.id] = {}
@@ -28,7 +29,7 @@ def setup_guild_member_list(guild):
             _guild_member_list[guild.id][guild.members[i].id] = display_name
         else:
             _guild_member_list[guild.id][guild.members[i].id] = guild.members[i].name
-    utils.timer.timer_member_list[guild.id] = time.time()
+    timer_member_list[guild.id] = time()
 
 def get_guild_member_nickname(guild_id, user_id):
     if guild_id not in _guild_member_list:
@@ -49,7 +50,7 @@ def get_guild_member_list(guild_id):
 
 def setup_guild_channel_list(guild):
     if guild.id in _guild_channel_list:
-        elapsed_time = time.time() - utils.timer.timer_channel_list[guild.id]
+        elapsed_time = time() - timer_channel_list[guild.id]
         if elapsed_time < 864000:
             return
     _guild_channel_list[guild.id] = {}
@@ -70,7 +71,7 @@ def setup_guild_channel_list(guild):
             elif channel.name.startswith('五王-'):
                 _guild_channel_list[guild.id][5] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 5
-    utils.timer.timer_channel_list[guild.id] = time.time()
+    timer_channel_list[guild.id] = time()
 
 def get_guild_channel_list(guild_id):
     if guild_id not in _guild_channel_list:

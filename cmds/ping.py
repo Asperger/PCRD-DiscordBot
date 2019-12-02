@@ -1,6 +1,6 @@
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
-import utils.line_manager as lm
+from utils.line_manager import get_line
 
 from utils.cmds_registry import register
 register(cmd="ping", alias="ping")
@@ -36,7 +36,7 @@ class ping:
             offset = int(param[0])
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        players = lm.get_line(guild_id, boss_id, offset)
+        players = get_line(guild_id, boss_id, offset)
 
         result = ''
         if players:

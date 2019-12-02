@@ -1,17 +1,17 @@
+from os.path import exists, dirname, join
 from collections import deque
-import os.path as path
-import threading
-import random
-import itertools
-import bisect
+from threading import Lock
+from random import randint
+from itertools import accumulate
+from bisect import bisect_left
 from utils.log import FileLogger
 
-_spam_setting_path = path.join(path.dirname(__file__), 'spam.setting')
+_spam_setting_path = join(dirname(__file__), 'spam.setting')
 _spam_setting = {}
-_spam_lock = threading.Lock()
+_spam_lock = Lock()
 _spam_limit = 5
 
-if path.exists(_spam_setting_path):
+if exists(_spam_setting_path):
     with open(_spam_setting_path, 'r', encoding="utf-8") as f:
         spam_setting_str = f.read()
         if spam_setting_str:
@@ -55,7 +55,7 @@ def set_spammer_weight(request, weight):
     with _spam_lock:
         if request in _spam_setting:
             if len(weight) == len(_spam_setting[request]["list"]):
-                _spam_setting[request]["weight"] = deque(itertools.accumulate(weight))
+                _spam_setting[request]["weight"] = deque(accumulate(weight))
                 result = True
 
     if result:
@@ -74,7 +74,7 @@ def set_spammer(request, response):
                 popleft_spammer(request)
         else:
             _spam_setting[request] = {"index": -1, "list": deque([response]), "weight":deque([1])}
-            _spam_setting[request]["weight"] = deque(itertools.accumulate(_spam_setting[request]["weight"]))
+            _spam_setting[request]["weight"] = deque(accumulate(_spam_setting[request]["weight"]))
 
     backup()
     return True
@@ -105,7 +105,7 @@ def get_spammer(request):
         # no use for random pick
         #index = (spam_setting[request]["index"] + 1) % len(spam_setting[request]["list"])
         #spam_setting[request]["index"] = index
-        index = bisect.bisect_left(_spam_setting[request]["weight"], random.randint(1, _spam_setting[request]["weight"][-1]))
+        index = bisect_left(_spam_setting[request]["weight"], randint(1, _spam_setting[request]["weight"][-1]))
         result = _spam_setting[request]["list"][index]
 
     return result

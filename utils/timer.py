@@ -1,9 +1,10 @@
+from datetime import datetime
+from pytz import timezone
+
 timer_usage = 0
 timer_member_list = {}
 timer_channel_list = {}
 
-from datetime import datetime
-from pytz import timezone    
 _eu_moscow = timezone('Europe/Moscow')
 
 def get_settlement_time_object():

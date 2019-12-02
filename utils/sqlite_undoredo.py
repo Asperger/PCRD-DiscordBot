@@ -14,18 +14,16 @@
 
 """Translation of the TCL example code from https://www.sqlite.org/undoredo.html."""
 
-import re
-import sqlite3
-import sys
+from sqlite3 import OperationalError
+from re import match
+from sys import exit, version_info
+from threading import RLock
 
-import threading
-
-if sys.version_info < (3, 6):
-    sys.exit('Python version 3.6 or later is required')
-
+if version_info < (3, 6):
+    exit('Python version 3.6 or later is required')
 
 class SQLiteUndoRedo:
-    _sqlur_lock = threading.RLock()
+    _sqlur_lock = RLock()
 
     def activate(self, *args):
         """Start up the undo/redo system.
@@ -204,7 +202,7 @@ class SQLiteUndoRedo:
         """
         try:
             db.execute("DROP TABLE undolog")
-        except sqlite3.OperationalError:
+        except OperationalError:
             pass
         db.execute("CREATE TEMP TABLE undolog(seq integer primary key, sql text)")
         for tbl in args:
@@ -240,12 +238,12 @@ class SQLiteUndoRedo:
         tlist = db.execute(
             "SELECT name FROM sqlite_temp_master WHERE type='trigger'").fetchall()
         for (trigger,) in tlist:
-            if not re.match("_.*_(i|u|d)t$", trigger):
+            if not match("_.*_(i|u|d)t$", trigger):
                 continue
             db.execute(f"DROP TRIGGER {trigger};")
         try:
             db.execute("DROP TABLE undolog")
-        except sqlite3.OperationalError:
+        except OperationalError:
             pass
 
     def _start_interval(self):

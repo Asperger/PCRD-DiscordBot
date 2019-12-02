@@ -1,5 +1,5 @@
-import operator
-import time
+from operator import itemgetter
+from time import clock
 
 _guild_lines = {}
 
@@ -57,7 +57,7 @@ def line_up(guild_id, user_id, boss_id):
         return False
 
     if user_id not in _guild_lines[guild_id][boss_id]["player_ids"]:
-        _guild_lines[guild_id][boss_id]["player_ids"][user_id] = time.clock()
+        _guild_lines[guild_id][boss_id]["player_ids"][user_id] = clock()
         return True
     else:
         return False
@@ -86,7 +86,7 @@ def get_line(guild_id, boss_id, offset):
         return None
 
     amount = _guild_lines[guild_id][boss_id]["amount"]
-    sorted_line = sorted(_guild_lines[guild_id][boss_id]["player_ids"].items(), key=operator.itemgetter(1))
+    sorted_line = sorted(_guild_lines[guild_id][boss_id]["player_ids"].items(), key=itemgetter(1))
     sorted_players = list(map(lambda x: x[0], sorted_line))
     if amount > 0:
         if offset > 0:

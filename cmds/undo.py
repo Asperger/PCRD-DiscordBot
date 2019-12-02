@@ -1,5 +1,5 @@
-import utils.db
-import utils.google_sheets_utils
+from utils.db import sqlur
+from utils.google_sheets_utils import undo as sheets_undo
 from utils.guild_member import get_guild_member_nickname
 
 from utils.cmds_registry import register
@@ -22,8 +22,8 @@ class undo:
 
     def run(self, user_auth, param):
         try:
-            description = utils.db.sqlur.undo()
-            utils.google_sheets_utils.undo()
+            description = sqlur.undo()
+            sheets_undo()
         except Exception:
             return '沒有可以取消的紀錄'
         return f'已取消 {description}'

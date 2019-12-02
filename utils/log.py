@@ -1,7 +1,9 @@
-import os
-os.makedirs('logs', exist_ok=True)
+from os import makedirs
+from logging import getLogger
+from logging.config import dictConfig
 
-import logging.config
+makedirs('logs', exist_ok=True)
+
 _config = {
     'version': 1,
     'formatters': {
@@ -37,6 +39,7 @@ _config = {
         }
     }
 }
-logging.config.dictConfig(_config)
-StreamLogger = logging.getLogger("StreamLogger")
-FileLogger = logging.getLogger("FileLogger")
+
+dictConfig(_config)
+StreamLogger = getLogger("StreamLogger")
+FileLogger = getLogger("FileLogger")

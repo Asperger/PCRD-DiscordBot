@@ -1,4 +1,4 @@
-import utils.db
+from utils.db import query, insert, upsert, sqlur
 from utils.log import FileLogger
 from utils.line_manager import line_off
 from utils.timer import get_settlement_time
@@ -57,7 +57,7 @@ class fill:
     def get_played_number(self, user_id):
         date = get_settlement_time()
         where = f"play_date='{date}' AND user_id={user_id}"
-        result = utils.db.query('UserTable', where)
+        result = query('UserTable', where)
         if result:
             return result[0]['normal_play'] + result[0]['compensate_play']
         else:
@@ -94,16 +94,16 @@ class fill:
             return f'{user_nickname} 試算表記錄失敗'
 
         column_value = {'user_id':user_id, 'rounds':boss_tags[0], 'boss':boss_tags[1], 'damage':damage}
-        result = utils.db.insert('TimeTable', column_value)
+        result = insert('TimeTable', column_value)
         if not result:
             return f'{user_nickname} 記錄失敗'
 
         column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1]), 'missing_play':plmiss}
-        db_result = utils.db.upsert('UserTable', column_value, f'user_id={user_id}')
+        db_result = upsert('UserTable', column_value, f'user_id={user_id}')
         if not db_result:
             return f'{user_nickname} 記錄失敗'
 
-        utils.db.sqlur.barrier(description)
+        sqlur.barrier(description)
         line_off(guild_id, user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
 

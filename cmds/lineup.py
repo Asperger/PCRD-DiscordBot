@@ -1,6 +1,6 @@
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
-import utils.line_manager as line_manager
+from utils.line_manager import line_up
 
 from utils.cmds_registry import register
 register(cmd="lineup", alias="+1")
@@ -28,7 +28,7 @@ class lineup:
         user_nickname = get_guild_member_nickname(guild_id, user_id)
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        result = line_manager.line_up(guild_id, user_id, boss_id)
+        result = line_up(guild_id, user_id, boss_id)
         if result:
             return f'{user_nickname} 排隊成功'
         else:

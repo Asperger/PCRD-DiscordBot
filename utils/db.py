@@ -1,14 +1,11 @@
-import json
-import os
-import datetime
-
+from os.path import join, dirname
+from sqlite3 import connect, OperationalError
 from utils.log import FileLogger
 from utils.sqlite_undoredo import SQLiteUndoRedo
-import utils.timer
+from utils.timer import get_settlement_time
 
-import sqlite3
-_db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
-_conn = sqlite3.connect(_db_conn_path)
+_db_conn_path = join(dirname(__file__),'repo.db')
+_conn = connect(_db_conn_path)
 try:
     _conn.executescript(
         '''CREATE TABLE "TimeTable" (
@@ -29,7 +26,7 @@ try:
             "played_boss"	TEXT NOT NULL
         );'''
     )
-except sqlite3.OperationalError:
+except OperationalError:
     pass
 
 sqlur = SQLiteUndoRedo(_conn)
@@ -49,7 +46,7 @@ def query(table, where):
                 column_value[str(cursor.description[i][0])] = row[i]
             result.append(column_value)    
             row = cursor.fetchone()
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
     return result
 
@@ -62,14 +59,14 @@ def insert(table, column_value):
     for i in column_value:
         columns += '{0},'.format(i)
         values += '{0},'.format(column_value[i])
-    play_date = utils.timer.get_settlement_time()
+    play_date = get_settlement_time()
     sql = f'''INSERT INTO {table} ({columns}play_date) VALUES ({values}'{play_date}')'''
 
     cursor = _conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
         _conn.rollback()
         return False
@@ -95,7 +92,7 @@ def increment(table, column_value, where):
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
         _conn.rollback()
         return False
@@ -107,7 +104,7 @@ def upsert(table, column_value, where):
     if not column_value:
         return False
 
-    play_date = utils.timer.get_settlement_time()
+    play_date = get_settlement_time()
     where += f''' AND play_date='{play_date}' '''
     result = query(table, where)
 

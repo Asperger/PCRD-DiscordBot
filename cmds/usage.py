@@ -1,6 +1,6 @@
+from time import time
 from utils.log import FileLogger
-import time
-import utils.timer
+from utils.timer import timer_usage
 
 from utils.cmds_registry import register
 register(cmd="usage", alias="usage")
@@ -18,10 +18,11 @@ class usage:
         return True
 
     def run(self, user_auth, param):
-        elapsed_time = time.time() - utils.timer.timer_usage
+        global timer_usage
+        elapsed_time = time() - timer_usage
         if elapsed_time < 30:
             return '肚子餓了...'
-        utils.timer.timer_usage = time.time()
+        timer_usage = time()
         return """填表功能:
 `!fill`或`!f` 填表
 `!status` 查看出刀情況

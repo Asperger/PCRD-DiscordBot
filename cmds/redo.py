@@ -1,5 +1,5 @@
-import utils.db
-import utils.google_sheets_utils
+from utils.db import sqlur
+from utils.google_sheets_utils import redo as sheets_redo
 from utils.guild_member import get_guild_member_nickname
 
 from utils.cmds_registry import register
@@ -22,8 +22,8 @@ class redo:
 
     def run(self, user_auth, param):
         try:
-            description = utils.db.sqlur.redo()
-            utils.google_sheets_utils.redo()
+            description = sqlur.redo()
+            sheets_redo()
         except Exception:
             return '沒有可以重做的紀錄'
         return f'已重做 {description}'

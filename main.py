@@ -1,21 +1,17 @@
 # Work with Python 3.6
-import dbl
-import discord
-from discord.ext import commands
-import json
-import collections
-import asyncio
+from discord import Client, Embed
+from json import dumps
+from collections import Mapping
 from urllib.parse import urlparse
 
 from utils.log import FileLogger
-
 from utils.token import get_token
 from args import parse_args
 from cmds.usage import usage
 
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 
-client = discord.Client()
+client = Client()
 
 def is_url(x):
     try:
@@ -50,17 +46,17 @@ async def on_message(message):
             content += f' {message.attachments[0].url}'
         msg = parse_args(user_auth, content)
         if msg:
-            if isinstance(msg, collections.Mapping):
+            if isinstance(msg, Mapping):
                 # it's a dict
                 for key in msg:
-                    await message.channel.send(f'{key}: {json.dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False)}')
+                    await message.channel.send(f'{key}: {dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False)}')
             elif isinstance(msg, list):
                 # it's a list
                 for i in range(len(msg)):
                     await message.channel.send(msg[i])
             elif is_url(msg):
                 # it's an url
-                embed = discord.Embed()
+                embed = Embed()
                 embed.set_image(url=msg)
                 await message.channel.send(embed=embed)
             else:

@@ -1,6 +1,6 @@
-import datetime
-import utils.db
-import utils.timer
+from datetime import datetime
+from utils.db import query
+from utils.timer import get_settlement_time
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_member_list
 
@@ -11,7 +11,7 @@ class status:
     def __init__(self):
         self.usage = '!status [all] [YYYY-MM-DD]'
         self.auth_warning = '你不是這個公會的隊員吧?'
-        self.date = utils.timer.get_settlement_time()
+        self.date = get_settlement_time()
         self.all_user = False
 
     def check_param(self, param):
@@ -22,7 +22,7 @@ class status:
                 self.all_user = True
             else:
                 try:
-                    datetime.datetime.strptime(p, '%Y-%m-%d')
+                    datetime.strptime(p, '%Y-%m-%d')
                 except ValueError:
                     return False
                 self.date = p
@@ -43,7 +43,7 @@ class status:
         if not self.all_user:
             where += f' AND user_id={user_id}'
 
-        result = utils.db.query('UserTable', where)
+        result = query('UserTable', where)
         report = ''
         member_list = get_guild_member_list(guild_id)
         player_count = len(member_list)

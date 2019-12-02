@@ -1,5 +1,5 @@
 from utils.log import FileLogger
-import utils.line_manager as lm
+from utils.line_manager import clear_line as _clear_line
 
 from utils.cmds_registry import register
 register(cmd="clear_line", alias="clear_line")
@@ -29,7 +29,7 @@ class clear_line:
 
     def run(self, user_auth, *param):
         comment = '設定失敗'
-        result = lm.clear_line(user_auth['guild_id'], self.boss)
+        result = _clear_line(user_auth['guild_id'], self.boss)
         if result:
             if self.boss == 0:
                 comment = '排隊記錄清除成功'
