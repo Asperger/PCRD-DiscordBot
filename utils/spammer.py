@@ -27,12 +27,6 @@ def revert_accumulate(arr):
         reverted[i] = arr[i] - arr[i-1]
     return reverted
 
-# weight initializaition
-def weight_init(request):
-    if request in spam_setting:
-        with spam_lock:
-            spam_setting[request]["weight"] = deque(itertools.accumulate([1] * len(spam_setting[request]["list"])))
-
 def pop_spammer(request):
     if request in spam_setting:
         spam_setting[request]["weight"].pop()
@@ -120,15 +114,9 @@ def list_spammer(request):
     result = {}
     if request:
         if request in spam_setting:
-            # weight initializaition
-            if "weight" not in spam_setting[request]:
-                weight_init(request)
             result[request] = revert_accumulate(spam_setting[request]["weight"])
     else:
         for key in spam_setting:
-            # weight initializaition
-            if "weight" not in spam_setting[key]:
-                weight_init(key)
             result[key] = revert_accumulate(spam_setting[key]["weight"])
     return result
 
