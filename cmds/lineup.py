@@ -1,7 +1,3 @@
-import os, sys, inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
 import utils.line_manager as line_manager

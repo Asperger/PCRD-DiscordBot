@@ -1,7 +1,5 @@
 from cmds import *
 from utils.log import FileLogger
-import time
-import utils.timer
 
 cmds_registry = {
     "help": "usage",
