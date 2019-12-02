@@ -1,20 +1,4 @@
-from cmds.usage import usage
-from cmds.fill import fill
-from cmds.status import status
-from cmds.undo import undo
-from cmds.redo import redo
-from cmds.ping import ping
-from cmds.lineup import lineup
-from cmds.lineoff import lineoff
-from cmds.spam import spam
-from cmds.set_spam import set_spam
-from cmds.set_spam_weight import set_spam_weight
-from cmds.clear_spam import clear_spam
-from cmds.list_spam import list_spam
-from cmds.set_line import set_line
-from cmds.clear_line import clear_line
-from cmds.switch_sheets import switch_sheets
-
+from cmds import *
 from utils.log import FileLogger
 import time
 import utils.timer
@@ -60,7 +44,7 @@ def parse_args(user_auth, string):
 
     # Create the instance
     try:
-        inst = globals()[cmd]()
+        inst = getattr(globals()[cmd], cmd)()
     except KeyError:
         FileLogger.warn(f'No command found')
     except IndexError:
@@ -91,4 +75,5 @@ if __name__ == '__main__':
         'user_admin': False
     }
     print(parse_args(user_auth, "help"))
-    print(parse_args(user_auth, 'status 2019-07-27'))
+    print(parse_args(user_auth, "status 2019-07-27"))
+    print(parse_args(user_auth, "ls"))
