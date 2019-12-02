@@ -1,6 +1,9 @@
 from utils.log import FileLogger
 from utils.spammer import get_spammer
 
+from utils.cmds_registry import register
+register(cmd="spam", alias="spam")
+
 class spam:
     def __init__(self):
         self.usage = '!spam <你的指令> 或 !<你的指令>'

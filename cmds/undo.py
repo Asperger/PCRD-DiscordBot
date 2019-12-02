@@ -2,6 +2,9 @@ import utils.db
 import utils.google_sheets_utils
 from utils.guild_member import get_guild_member_nickname
 
+from utils.cmds_registry import register
+register(cmd="undo", alias="undo")
+
 class undo:
     def __init__(self):
         self.usage = '!undo'

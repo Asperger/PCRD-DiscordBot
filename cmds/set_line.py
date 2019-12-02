@@ -1,9 +1,12 @@
 from utils.log import FileLogger
 import utils.line_manager as line_manager
 
+from utils.cmds_registry import register
+register(cmd="set_line", alias="set_line")
+
 class set_line:
     def __init__(self):
-        self.usage = '!set_line <幾王> <人數>\n人數為0代表不限'
+        self.usage = '!set_line <幾王> <人數>\n設定正選的人數，人數為0代表不限人數'
         self.auth_warning = '只有公會的管理員才能使用這個功能'
 
     def check_param(self, param):

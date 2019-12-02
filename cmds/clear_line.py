@@ -1,6 +1,9 @@
 from utils.log import FileLogger
 import utils.line_manager as lm
 
+from utils.cmds_registry import register
+register(cmd="clear_line", alias="clear_line")
+
 class clear_line:
     def __init__(self):
         self.usage = '!clear_line [幾王]\n不指定王將清除所有排隊紀錄'

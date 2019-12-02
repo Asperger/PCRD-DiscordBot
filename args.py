@@ -1,32 +1,6 @@
 from cmds import *
 from utils.log import FileLogger
-
-cmds_registry = {
-    "help": "usage",
-    "usage": "usage",
-    "f": "fill",
-    "fill": "fill",
-    "status": "status",
-    "undo": "undo",
-    "redo": "redo",
-    "ping": "ping",
-    "+1": "lineup",
-    "lineup": "lineup",
-    "-1": "lineoff",
-    "lineoff": "lineoff",
-    "spam": "spam",
-    "ss": "set_spam",
-    "set_spam": "set_spam",
-    "ssw": "set_spam_weight",
-    "set_spam_weight": "set_spam_weight",
-    "cs": "clear_spam",
-    "clear_spam": "clear_spam",
-    "ls": "list_spam",
-    "list_spam": "list_spam",
-    "set_line": "set_line",
-    "clear_line": "clear_line",
-    "switch_sheets": "switch_sheets"
-}
+from utils.cmds_registry import get_cmd
 
 def parse_args(user_auth, string):
     args = string.split()
@@ -35,17 +9,16 @@ def parse_args(user_auth, string):
         return response
 
     # Find command, otherwise consider it as spam
-    cmd = "spam"
-    if args[0] in cmds_registry:
-        cmd = cmds_registry[args[0]]
+    cmd = get_cmd(args[0])
+    if cmd:
         args = args[1:]
+    else:
+        cmd = "spam"
 
     # Create the instance
     try:
         inst = getattr(globals()[cmd], cmd)()
     except KeyError:
-        FileLogger.warn(f'No command found')
-    except IndexError:
         FileLogger.warn(f'No command found')
     except Exception:
         FileLogger.exception(f'Exception at {__file__} {__name__}')

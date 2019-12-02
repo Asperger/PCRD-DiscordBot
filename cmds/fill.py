@@ -5,6 +5,10 @@ from utils.timer import get_settlement_time
 from utils.guild_member import get_guild_member_nickname
 from utils.google_sheets_utils import fill_sheet
 
+from utils.cmds_registry import register
+register(cmd="fill", alias="fill")
+register(cmd="fill", alias="f")
+
 class fill:
     def __init__(self):
         self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補] [閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'

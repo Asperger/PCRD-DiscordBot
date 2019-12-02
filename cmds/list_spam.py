@@ -1,6 +1,10 @@
 from utils.log import FileLogger
 from utils.spammer import list_spammer
 
+from utils.cmds_registry import register
+register(cmd="list_spam", alias="list_spam")
+register(cmd="list_spam", alias="ls")
+
 class list_spam:
     def __init__(self):
         self.usage = '!list_spam [指令]'

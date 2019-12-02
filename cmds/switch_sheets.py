@@ -1,6 +1,9 @@
 from utils.log import FileLogger
 import utils.google_sheets_utils as sheet
 
+from utils.cmds_registry import register
+register(cmd="switch_sheets", alias="switch_sheets")
+
 class switch_sheets:
     def __init__(self):
         self.usage = '!switch_sheets [sheet_ID]'

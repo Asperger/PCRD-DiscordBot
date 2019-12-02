@@ -1,6 +1,10 @@
 from utils.log import FileLogger
 from utils.spammer import set_spammer_weight
 
+from utils.cmds_registry import register
+register(cmd="set_spam_weight", alias="set_spam_weight")
+register(cmd="set_spam_weight", alias="ssw")
+
 class set_spam_weight:
     def __init__(self):
         self.usage = '!set_spam_weight <你的指令> [w1 w2 w3 ...]'

@@ -1,9 +1,11 @@
+import datetime
 import utils.db
 import utils.timer
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_member_list
 
-import datetime
+from utils.cmds_registry import register
+register(cmd="status", alias="status")
 
 class status:
     def __init__(self):

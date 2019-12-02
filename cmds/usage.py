@@ -2,6 +2,10 @@ from utils.log import FileLogger
 import time
 import utils.timer
 
+from utils.cmds_registry import register
+register(cmd="usage", alias="usage")
+register(cmd="usage", alias="help")
+
 class usage:
     def __init__(self):
         self.usage = '!help'

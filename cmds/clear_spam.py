@@ -1,6 +1,10 @@
 from utils.log import FileLogger
 from utils.spammer import clear_spammer
 
+from utils.cmds_registry import register
+register(cmd="clear_spam", alias="clear_spam")
+register(cmd="clear_spam", alias="cs")
+
 class clear_spam:
     def __init__(self):
         self.usage = '!clear_spam <指令> [old|new]\n指定old將移除最舊的反應，指定new將移除最新的反應\n不指定將移除該指令及所有反應'

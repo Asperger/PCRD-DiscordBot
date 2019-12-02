@@ -2,6 +2,9 @@ from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
 import utils.line_manager as line_manager
 
+from utils.cmds_registry import register
+register(cmd="lineoff", alias="-1")
+
 class lineoff:
     def __init__(self):
         self.usage = '!-1 [備註]\n備註沒有作用，你可以隨便寫或不寫，例如你要用的隊伍或一些幹話'

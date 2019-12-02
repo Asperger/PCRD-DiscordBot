@@ -1,10 +1,13 @@
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
-import utils.line_manager as line_manager
+import utils.line_manager as lm
+
+from utils.cmds_registry import register
+register(cmd="ping", alias="ping")
 
 class ping:
     def __init__(self):
-        self.usage = '!ping [人數]'
+        self.usage = '!ping [人數]\n不指定人數時將呼叫正選的人\n指定人數時則以此數目呼叫備選的人'
         self.auth_warning = '你不是這個公會的隊員吧?'
         self.basic = True
 
@@ -33,7 +36,7 @@ class ping:
             offset = int(param[0])
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        players = line_manager.get_line(guild_id, boss_id, offset)
+        players = lm.get_line(guild_id, boss_id, offset)
 
         result = ''
         if players:
