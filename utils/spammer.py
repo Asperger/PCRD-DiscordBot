@@ -128,12 +128,12 @@ def list_spammer(request):
         for key in spam_setting:
             # weight initializaition
             if "weight" not in spam_setting[key]:
-                weight_init(request)
+                weight_init(key)
             result[key] = revert_accumulate(spam_setting[key]["weight"])
     return result
 
 if __name__ == '__main__':
-    print(list_spammer('<:REDiveCrystal:628287087237660692>'))
+    print(list_spammer(''))
     set_spammer_weight('<:REDiveCrystal:628287087237660692>', [795,180,25])
     print(list_spammer('<:REDiveCrystal:628287087237660692>'))
     print(get_spammer('<:REDiveCrystal:628287087237660692>'))
