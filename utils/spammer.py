@@ -6,20 +6,20 @@ import itertools
 import bisect
 from utils.log import FileLogger
 
-spam_setting_path = path.join(path.dirname(__file__), 'spam.setting')
-spam_setting = {}
-spam_lock = threading.Lock()
-spam_limit = 5
+_spam_setting_path = path.join(path.dirname(__file__), 'spam.setting')
+_spam_setting = {}
+_spam_lock = threading.Lock()
+_spam_limit = 5
 
-if path.exists(spam_setting_path):
-    with open(spam_setting_path, 'r', encoding="utf-8") as f:
+if path.exists(_spam_setting_path):
+    with open(_spam_setting_path, 'r', encoding="utf-8") as f:
         spam_setting_str = f.read()
         if spam_setting_str:
             try:
-                spam_setting = eval(spam_setting_str)
+                _spam_setting = eval(spam_setting_str)
             except Exception as e:
                 FileLogger.error(f'Fail to read spam setting: {str(e)}')
-                spam_setting = {}
+                _spam_setting = {}
 
 def revert_accumulate(arr):
     reverted = [arr[0]] * len(arr)
@@ -28,34 +28,34 @@ def revert_accumulate(arr):
     return reverted
 
 def pop_spammer(request):
-    if request in spam_setting:
-        spam_setting[request]["weight"].pop()
-        spam_setting[request]["list"].pop()
+    if request in _spam_setting:
+        _spam_setting[request]["weight"].pop()
+        _spam_setting[request]["list"].pop()
 
 def popleft_spammer(request):
-    if request in spam_setting:
-        popped = spam_setting[request]["weight"][0]
-        for k,v in enumerate(spam_setting[request]["weight"]):
-            spam_setting[request]["weight"][k] = v - popped
-        spam_setting[request]["weight"].popleft()
-        spam_setting[request]["list"].popleft()
+    if request in _spam_setting:
+        popped = _spam_setting[request]["weight"][0]
+        for k,v in enumerate(_spam_setting[request]["weight"]):
+            _spam_setting[request]["weight"][k] = v - popped
+        _spam_setting[request]["weight"].popleft()
+        _spam_setting[request]["list"].popleft()
 
 def backup():
-    with spam_lock:
-        with open(spam_setting_path, 'w', encoding="utf-8") as f:
+    with _spam_lock:
+        with open(_spam_setting_path, 'w', encoding="utf-8") as f:
             try:
-                f.write(repr(spam_setting))
+                f.write(repr(_spam_setting))
             except Exception as e:
                 FileLogger.error(f'Fail to write spam setting: {str(e)}')
 
 def set_spammer_weight(request, weight):
-    global spam_setting
+    global _spam_setting
     result = False
 
-    with spam_lock:
-        if request in spam_setting:
-            if len(weight) == len(spam_setting[request]["list"]):
-                spam_setting[request]["weight"] = deque(itertools.accumulate(weight))
+    with _spam_lock:
+        if request in _spam_setting:
+            if len(weight) == len(_spam_setting[request]["list"]):
+                _spam_setting[request]["weight"] = deque(itertools.accumulate(weight))
                 result = True
 
     if result:
@@ -63,30 +63,30 @@ def set_spammer_weight(request, weight):
     return result
 
 def set_spammer(request, response):
-    global spam_setting
+    global _spam_setting
 
-    with spam_lock:
-        if request in spam_setting:
-            spam_setting[request]["weight"].append(spam_setting[request]["weight"][-1]+1)
-            spam_setting[request]["list"].append(response)
+    with _spam_lock:
+        if request in _spam_setting:
+            _spam_setting[request]["weight"].append(_spam_setting[request]["weight"][-1]+1)
+            _spam_setting[request]["list"].append(response)
 
-            if len(spam_setting[request]["list"]) > spam_limit:
+            if len(_spam_setting[request]["list"]) > _spam_limit:
                 popleft_spammer(request)
         else:
-            spam_setting[request] = {"index": -1, "list": deque([response]), "weight":deque([1])}
-            spam_setting[request]["weight"] = deque(itertools.accumulate(spam_setting[request]["weight"]))
+            _spam_setting[request] = {"index": -1, "list": deque([response]), "weight":deque([1])}
+            _spam_setting[request]["weight"] = deque(itertools.accumulate(_spam_setting[request]["weight"]))
 
     backup()
     return True
 
 def clear_spammer(request, mode):
-    global spam_setting
+    global _spam_setting
     result = False
 
-    with spam_lock:
-        if request in spam_setting:
-            if mode == 0 or len(spam_setting[request]["list"]) == 1:
-                del spam_setting[request]
+    with _spam_lock:
+        if request in _spam_setting:
+            if mode == 0 or len(_spam_setting[request]["list"]) == 1:
+                del _spam_setting[request]
             elif mode > 0:
                 popleft_spammer(request)
             elif mode < 0:
@@ -98,26 +98,26 @@ def clear_spammer(request, mode):
     return result
 
 def get_spammer(request):
-    global spam_setting
+    global _spam_setting
     result = None
 
-    if request in spam_setting:
+    if request in _spam_setting:
         # no use for random pick
         #index = (spam_setting[request]["index"] + 1) % len(spam_setting[request]["list"])
         #spam_setting[request]["index"] = index
-        index = bisect.bisect_left(spam_setting[request]["weight"], random.randint(1, spam_setting[request]["weight"][-1]))
-        result = spam_setting[request]["list"][index]
+        index = bisect.bisect_left(_spam_setting[request]["weight"], random.randint(1, _spam_setting[request]["weight"][-1]))
+        result = _spam_setting[request]["list"][index]
 
     return result
 
 def list_spammer(request):
     result = {}
     if request:
-        if request in spam_setting:
-            result[request] = revert_accumulate(spam_setting[request]["weight"])
+        if request in _spam_setting:
+            result[request] = revert_accumulate(_spam_setting[request]["weight"])
     else:
-        for key in spam_setting:
-            result[key] = revert_accumulate(spam_setting[key]["weight"])
+        for key in _spam_setting:
+            result[key] = revert_accumulate(_spam_setting[key]["weight"])
     return result
 
 if __name__ == '__main__':

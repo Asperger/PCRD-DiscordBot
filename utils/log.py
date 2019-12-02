@@ -2,7 +2,7 @@ import os
 os.makedirs('logs', exist_ok=True)
 
 import logging.config
-config = {
+_config = {
     'version': 1,
     'formatters': {
         'simple': {
@@ -37,6 +37,6 @@ config = {
         }
     }
 }
-logging.config.dictConfig(config)
+logging.config.dictConfig(_config)
 StreamLogger = logging.getLogger("StreamLogger")
 FileLogger = logging.getLogger("FileLogger")

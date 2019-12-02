@@ -8,33 +8,33 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-scopes = ['https://www.googleapis.com/auth/spreadsheets']
-creds_path = path.join(path.dirname(__file__), 'credentials.json')
-pickle_path = path.join(path.dirname(__file__), 'token.pickle')
-sheet_id_path = path.join(path.dirname(__file__), 'sheet.id')
-creds = None
+_scopes = ['https://www.googleapis.com/auth/spreadsheets']
+_creds_path = path.join(path.dirname(__file__), 'credentials.json')
+_pickle_path = path.join(path.dirname(__file__), 'token.pickle')
+_sheet_id_path = path.join(path.dirname(__file__), 'sheet.id')
+_creds = None
 # The file token.pickle stores the user's access and refresh tokens, and is
 # created automatically when the authorization flow completes for the first
 # time.
-if path.exists(pickle_path):
-    with open(pickle_path, 'rb') as token:
-        creds = pickle.load(token)
+if path.exists(_pickle_path):
+    with open(_pickle_path, 'rb') as token:
+        _creds = pickle.load(token)
 # If there are no (valid) credentials available, let the user log in.
-if not creds or not creds.valid:
-    if creds and creds.expired and creds.refresh_token:
-        creds.refresh(Request())
+if not _creds or not _creds.valid:
+    if _creds and _creds.expired and _creds.refresh_token:
+        _creds.refresh(Request())
     else:
-        flow = InstalledAppFlow.from_client_secrets_file(creds_path, scopes)
-        creds = flow.run_console()
+        flow = InstalledAppFlow.from_client_secrets_file(_creds_path, _scopes)
+        _creds = flow.run_console()
     # Save the credentials for the next run
-    with open(pickle_path, 'wb') as token:
-        pickle.dump(creds, token)
+    with open(_pickle_path, 'wb') as token:
+        pickle.dump(_creds, token)
 
-service = build('sheets', 'v4', credentials=creds)
+_service = build('sheets', 'v4', credentials=_creds)
 
-spreadsheet_id = ''
-start_date = datetime.now()
-player_list = {}
+_spreadsheet_id = ''
+_start_date = datetime.now()
+_player_list = {}
 
 _undo = {}
 _undo['undostack'] = []
@@ -42,38 +42,38 @@ _undo['redostack'] = []
 _sheet_lock = threading.RLock()
 
 def get_sheets_id():
-    global spreadsheet_id
-    return spreadsheet_id
+    global _spreadsheet_id
+    return _spreadsheet_id
 
 def read_sheet(range_name):
     try:
-        sheets = service.spreadsheets()
-        result = sheets.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+        sheets = _service.spreadsheets()
+        result = sheets.values().get(spreadsheetId=_spreadsheet_id, range=range_name).execute()
     except Exception as e:
-        FileLogger.error(f'Fail to read sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        FileLogger.error(f'Fail to read sheet: ID={_spreadsheet_id}, range={range_name}\n'+ str(e))
         return
     return result.get('values', [])
 
 def write_sheet(range_name, body, option='RAW'):
     try:
-        sheets = service.spreadsheets()
-        result = sheets.values().update(spreadsheetId=spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
+        sheets = _service.spreadsheets()
+        result = sheets.values().update(spreadsheetId=_spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
     except Exception as e:
-        FileLogger.error(f'Fail to write sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        FileLogger.error(f'Fail to write sheet: ID={_spreadsheet_id}, range={range_name}\n'+ str(e))
         return
     return result
 
 def append_sheet(range_name, body, option='RAW'):
     try:
-        sheets = service.spreadsheets()
-        result = sheets.values().append(spreadsheetId=spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
+        sheets = _service.spreadsheets()
+        result = sheets.values().append(spreadsheetId=_spreadsheet_id, range=range_name, body=body, valueInputOption=option).execute()
     except Exception as e:
-        FileLogger.error(f'Fail to append sheet: ID={spreadsheet_id}, range={range_name}\n'+ str(e))
+        FileLogger.error(f'Fail to append sheet: ID={_spreadsheet_id}, range={range_name}\n'+ str(e))
         return
     return result
 
 def get_start_date():
-    global start_date
+    global _start_date
     values = read_sheet('隊員列表!A1:A1')
 
     if not values:
@@ -82,39 +82,39 @@ def get_start_date():
     else:
         date_tokens = values[0][0].split('/')
         settlement_time = get_settlement_time_object()
-        start_date = datetime(year=int(date_tokens[0]), month=int(date_tokens[1]), day=int(date_tokens[2])).replace(tzinfo=settlement_time.tzinfo)
-        return start_date
+        _start_date = datetime(year=int(date_tokens[0]), month=int(date_tokens[1]), day=int(date_tokens[2])).replace(tzinfo=settlement_time.tzinfo)
+        return _start_date
 
 def get_player_list():
-    global player_list
+    global _player_list
     values = read_sheet('隊員列表!B2:C')
 
     if not values:
         FileLogger.error('No player list found.')
         return None
     else:
-        player_list = {}
+        _player_list = {}
         for row in values:
-            player_list[int(row[1])] = row[0]
-        return player_list
+            _player_list[int(row[1])] = row[0]
+        return _player_list
 
 def switch_sheets(sheet_id):
-    global spreadsheet_id
-    spreadsheet_id = sheet_id
+    global _spreadsheet_id
+    _spreadsheet_id = sheet_id
     start_date = get_start_date()
     player_list = get_player_list()
 
-    with open(sheet_id_path, 'w') as f:
-        f.write(spreadsheet_id)
+    with open(_sheet_id_path, 'w') as f:
+        f.write(_spreadsheet_id)
 
-    return spreadsheet_id, start_date, player_list
+    return _spreadsheet_id, start_date, player_list
 
 def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, play_option, play_miss):
     global _undo, _sheet_lock
-    if player_discord_id not in player_list:
+    if player_discord_id not in _player_list:
         FileLogger.warn(f'Discord ID: {player_discord_id} not found in sheet')
         return False
-    player_nickname = player_list[player_discord_id]
+    player_nickname = _player_list[player_discord_id]
 
     today = get_settlement_time_object()
     play_tag = f"{play_number}{'B' if play_option == '補' else 'A'}"
@@ -126,7 +126,7 @@ def fill_sheet(player_discord_id, description, play_number, boss_tag, damage, pl
             ]
         ]
     }
-    play_day_offset = today - start_date
+    play_day_offset = today - _start_date
     range_name = f'Day {play_day_offset.days + 1}-Log!A2:F'
 
     _sheet_lock.acquire()
@@ -199,8 +199,8 @@ def redo():
 
 # The file sheet.id stores the id of a specific google sheet, and is
 # created automatically when the switching happens.
-if path.exists(sheet_id_path):
-    with open(sheet_id_path, 'r') as f:
+if path.exists(_sheet_id_path):
+    with open(_sheet_id_path, 'r') as f:
         switch_sheets(f.read())
 
 if __name__ == '__main__':

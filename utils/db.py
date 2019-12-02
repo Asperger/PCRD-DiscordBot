@@ -7,10 +7,10 @@ from utils.sqlite_undoredo import SQLiteUndoRedo
 import utils.timer
 
 import sqlite3
-db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
-conn = sqlite3.connect(db_conn_path)
+_db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
+_conn = sqlite3.connect(_db_conn_path)
 try:
-    conn.executescript(
+    _conn.executescript(
         '''CREATE TABLE "TimeTable" (
             "user_id"	INTEGER NOT NULL,
             "rounds"	INTEGER NOT NULL,
@@ -32,11 +32,11 @@ try:
 except sqlite3.OperationalError:
     pass
 
-sqlur = SQLiteUndoRedo(conn)
+sqlur = SQLiteUndoRedo(_conn)
 sqlur.activate('TimeTable', 'UserTable')
 
 def query(table, where):
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
 
     sql = f'''SELECT * FROM {table} WHERE {where}'''
     result = []
@@ -65,16 +65,16 @@ def insert(table, column_value):
     play_date = utils.timer.get_settlement_time()
     sql = f'''INSERT INTO {table} ({columns}play_date) VALUES ({values}'{play_date}')'''
 
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
     except sqlite3.OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
-        conn.rollback()
+        _conn.rollback()
         return False
     cursor.execute("COMMIT") 
-    conn.commit()
+    _conn.commit()
     return True
 
 def increment(table, column_value, where):
@@ -91,16 +91,16 @@ def increment(table, column_value, where):
             sets += f'''{i}={i}+{column_value[i]},'''
     sql = f'''UPDATE {table} SET {sets[:-1]} WHERE {where}'''
 
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
     except sqlite3.OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
-        conn.rollback()
+        _conn.rollback()
         return False
     cursor.execute("COMMIT") 
-    conn.commit()
+    _conn.commit()
     return True
 
 def upsert(table, column_value, where):
