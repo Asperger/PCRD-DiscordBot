@@ -1,7 +1,6 @@
 _cmds_registry = {}
 
 def register(cmd:str, alias:str) -> bool:
-    _cmds_registry[alias] = cmd
     if alias in _cmds_registry:
         return False
     else:
