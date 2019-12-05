@@ -51,7 +51,7 @@ def get_guild_member_list(guild_id):
 def setup_guild_channel_list(guild):
     if guild.id in _guild_channel_list:
         elapsed_time = time() - timer_channel_list[guild.id]
-        if elapsed_time < 864000:
+        if elapsed_time < 86400:
             return
     _guild_channel_list[guild.id] = {}
     for channel in guild.channels:
