@@ -55,20 +55,20 @@ def setup_guild_channel_list(guild):
             return
     _guild_channel_list[guild.id] = {}
     for channel in guild.channels:
-        if channel.type.name == 'text' and channel.category.name.endswith('討論區'):
-            if channel.name.startswith('一王-'):
+        if channel.type.name == 'text' and channel.category.name.endswith('公會戰討論區'):
+            if channel.name.startswith('一王'):
                 _guild_channel_list[guild.id][1] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 1
-            elif channel.name.startswith('二王-'):
+            elif channel.name.startswith('二王'):
                 _guild_channel_list[guild.id][2] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 2
-            elif channel.name.startswith('三王-'):
+            elif channel.name.startswith('三王'):
                 _guild_channel_list[guild.id][3] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 3
-            elif channel.name.startswith('四王-'):
+            elif channel.name.startswith('四王'):
                 _guild_channel_list[guild.id][4] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 4
-            elif channel.name.startswith('五王-'):
+            elif channel.name.startswith('五王'):
                 _guild_channel_list[guild.id][5] = channel.id
                 _guild_channel_list[guild.id][channel.id] = 5
     timer_channel_list[guild.id] = time()
