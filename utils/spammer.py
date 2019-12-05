@@ -114,10 +114,11 @@ def list_spammer(request):
     result = {}
     if request:
         if request in _spam_setting:
-            result[request] = revert_accumulate(_spam_setting[request]["weight"])
+            result["weight"] = revert_accumulate(_spam_setting[request]["weight"])
+            result["list"] = _spam_setting[request]["list"]
     else:
         for key in _spam_setting:
-            result[key] = revert_accumulate(_spam_setting[key]["weight"])
+            result[key] = len(_spam_setting[key]["list"])
     return result
 
 if __name__ == '__main__':

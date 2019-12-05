@@ -23,12 +23,16 @@ class list_spam:
 
         comment = ''
         spam_list = list_spammer(cmd)
-        for key in spam_list:
-            number = len(spam_list[key])
-            comment += f'{key} 共{number}種反應'
+        if cmd and spam_list:
+            number = len(spam_list['list'])
+            comment += f'{cmd} 共{number}種反應'
             if number > 1:
-                comment += f' 權重: {" ".join(map(str, spam_list[key]))}'
-            comment += '\n'
+                comment += f' 權重: [{" ".join(map(str, spam_list["weight"]))}]\n'
+                for spam_str in spam_list['list']:
+                    comment += f'{spam_str}\n'
+        else:
+            for key in spam_list:
+                comment += f'{key} 共{spam_list[key]}種反應\n'
 
         if not comment:
             comment = '目前沒有設定反應'
