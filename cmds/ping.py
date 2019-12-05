@@ -41,7 +41,7 @@ class ping:
         result = ''
         if players:
             for player in players:
-                result += f'<@{player}> '
+                result += f'<@{player.id}> {player.comment}\n'
         else:
             result = '目前沒有人在排隊'
         return result

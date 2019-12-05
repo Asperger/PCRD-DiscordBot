@@ -3,6 +3,15 @@ from time import clock
 
 _guild_lines = {}
 
+class reserved:
+    def __init__(self, id, cmt):
+        self.time = clock()
+        self.id = id
+        self.comment = cmt
+
+    def __lt__(self, other):
+        return self.time < other.time
+
 def clear_line(guild_id, boss_id):
     global _guild_lines
     if guild_id in _guild_lines:
@@ -51,13 +60,13 @@ def set_guild_lines(guild_id, boss_id):
 
     return boss_id in _guild_lines[guild_id]
 
-def line_up(guild_id, user_id, boss_id):
+def line_up(guild_id, user_id, boss_id, comment):
     global _guild_lines
     if not set_guild_lines(guild_id, boss_id):
         return False
 
     if user_id not in _guild_lines[guild_id][boss_id]["player_ids"]:
-        _guild_lines[guild_id][boss_id]["player_ids"][user_id] = clock()
+        _guild_lines[guild_id][boss_id]["player_ids"][user_id] = reserved(user_id, comment)
         return True
     else:
         return False
@@ -87,7 +96,7 @@ def get_line(guild_id, boss_id, offset):
 
     amount = _guild_lines[guild_id][boss_id]["amount"]
     sorted_line = sorted(_guild_lines[guild_id][boss_id]["player_ids"].items(), key=itemgetter(1))
-    sorted_players = list(map(lambda x: x[0], sorted_line))
+    sorted_players = list(map(lambda x: x[1], sorted_line))
     if amount > 0:
         if offset > 0:
             return sorted_players[amount:amount+offset]
@@ -99,10 +108,10 @@ def get_line(guild_id, boss_id, offset):
 if __name__ == '__main__':
     guild_id, boss_id = 123, 1
     set_line(guild_id, boss_id, 3)
-    line_up(guild_id, 100001, boss_id)
-    line_up(guild_id, 100002, boss_id)
-    line_up(guild_id, 100003, boss_id)
-    line_up(guild_id, 100004, boss_id)
-    line_up(guild_id, 100005, boss_id)
+    line_up(guild_id, 100001, boss_id, '')
+    line_up(guild_id, 100002, boss_id, '')
+    line_up(guild_id, 100003, boss_id, '')
+    line_up(guild_id, 100004, boss_id, '')
+    line_up(guild_id, 100005, boss_id, '')
     print(get_line(guild_id, boss_id, 0))
     print(get_line(guild_id, boss_id, 1))

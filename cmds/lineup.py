@@ -27,8 +27,9 @@ class lineup:
 
         user_nickname = get_guild_member_nickname(guild_id, user_id)
 
+        comment = ' '.join(param) if param else ''
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        result = line_up(guild_id, user_id, boss_id)
+        result = line_up(guild_id, user_id, boss_id, comment)
         if result:
             return f'{user_nickname} 排隊成功'
         else:
