@@ -63,24 +63,24 @@ def set_guild_lines(guild_id, boss_id):
 def line_up(guild_id, user_id, boss_id, comment):
     global _guild_lines
     if not set_guild_lines(guild_id, boss_id):
-        return False
+        return ''
 
     if user_id not in _guild_lines[guild_id][boss_id]["player_ids"]:
         _guild_lines[guild_id][boss_id]["player_ids"][user_id] = reserved(user_id, comment)
-        return True
+        return '排隊成功'
     else:
-        return False
+        return '已在隊伍中'
 
 def line_off(guild_id, user_id, boss_id):
     global _guild_lines
     if not check_guild_lines(guild_id, boss_id):
-        return False
+        return ''
 
     if user_id not in _guild_lines[guild_id][boss_id]["player_ids"]:
-        return False
+        return '不在隊伍中'
     else:
         del _guild_lines[guild_id][boss_id]["player_ids"][user_id]
-        return True
+        return '取消排隊成功'
 
 def set_line(guild_id, boss_id, amount):
     global _guild_lines

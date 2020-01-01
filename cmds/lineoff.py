@@ -30,6 +30,6 @@ class lineoff:
         boss_id = get_guild_channel_index(guild_id, channel_id)
         result = line_off(guild_id, user_id, boss_id)
         if result:
-            return f'{user_nickname} 取消排隊成功'
+            return f'{user_nickname} {result}'
         else:
-            return f'{user_nickname} 取消排隊失敗'
+            return '隊伍設定錯誤'
