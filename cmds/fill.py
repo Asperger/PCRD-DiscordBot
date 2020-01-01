@@ -104,7 +104,8 @@ class fill:
             return f'{user_nickname} 記錄失敗'
 
         sqlur.barrier(description)
-        line_off(guild_id, user_id, int(boss_tags[1]))
+        if pltype != 'last_play':
+            line_off(guild_id, user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
 
 if __name__ == '__main__':
