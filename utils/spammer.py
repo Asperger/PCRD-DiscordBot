@@ -121,6 +121,16 @@ def list_spammer(request):
             result[key] = len(_spam_setting[key]["list"])
     return result
 
+def rename_spammer(request, name):
+    if request not in _spam_setting:
+        return f'目前沒有 {request} 這個指令'
+    if name in _spam_setting:
+        return f'目前已經有 {name} 這個指令了'
+
+    _spam_setting[name] = _spam_setting[request]
+    del _spam_setting[request]
+    return ''
+
 if __name__ == '__main__':
     print(list_spammer(''))
     set_spammer_weight('<:REDiveCrystal:628287087237660692>', [795,180,25])

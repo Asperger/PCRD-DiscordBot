@@ -12,6 +12,7 @@ __all__ = [
     "set_spam_weight",
     "clear_spam",
     "list_spam",
+    "rename_spam",
     "set_line",
     "clear_line",
     "switch_sheets"
