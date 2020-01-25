@@ -9,6 +9,9 @@ class reserved:
         self.id = id
         self.comment = cmt
 
+    def __str__(self):
+        return f"{self.id} {self.comment} {self.time}"
+
     def __lt__(self, other):
         return self.time < other.time
 
@@ -107,11 +110,11 @@ def get_line(guild_id, boss_id, offset):
 
 if __name__ == '__main__':
     guild_id, boss_id = 123, 1
-    set_line(guild_id, boss_id, 3)
-    line_up(guild_id, 100001, boss_id, '')
-    line_up(guild_id, 100002, boss_id, '')
-    line_up(guild_id, 100003, boss_id, '')
-    line_up(guild_id, 100004, boss_id, '')
     line_up(guild_id, 100005, boss_id, '')
-    print(get_line(guild_id, boss_id, 0))
-    print(get_line(guild_id, boss_id, 1))
+    line_up(guild_id, 100004, boss_id, '')
+    line_up(guild_id, 100003, boss_id, '')
+    line_up(guild_id, 100002, boss_id, '')
+    line_up(guild_id, 100001, boss_id, '')
+    set_line(guild_id, boss_id, 3)
+    print(*get_line(guild_id, boss_id, 0), sep = "\n")
+    print(*get_line(guild_id, boss_id, 1), sep = "\n")
