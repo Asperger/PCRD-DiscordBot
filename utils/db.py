@@ -1,16 +1,13 @@
-import json
-import os
-import datetime
-
+from os.path import join, dirname
+from sqlite3 import connect, OperationalError
 from utils.log import FileLogger
 from utils.sqlite_undoredo import SQLiteUndoRedo
-import utils.timer
+from utils.timer import get_settlement_time
 
-import sqlite3
-db_conn_path = os.path.join(os.path.dirname(__file__),'repo.db')
-conn = sqlite3.connect(db_conn_path)
+_db_conn_path = join(dirname(__file__),'repo.db')
+_conn = connect(_db_conn_path)
 try:
-    conn.executescript(
+    _conn.executescript(
         '''CREATE TABLE "TimeTable" (
             "user_id"	INTEGER NOT NULL,
             "rounds"	INTEGER NOT NULL,
@@ -29,14 +26,14 @@ try:
             "played_boss"	TEXT NOT NULL
         );'''
     )
-except sqlite3.OperationalError:
+except OperationalError:
     pass
 
-sqlur = SQLiteUndoRedo(conn)
+sqlur = SQLiteUndoRedo(_conn)
 sqlur.activate('TimeTable', 'UserTable')
 
 def query(table, where):
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
 
     sql = f'''SELECT * FROM {table} WHERE {where}'''
     result = []
@@ -49,7 +46,7 @@ def query(table, where):
                 column_value[str(cursor.description[i][0])] = row[i]
             result.append(column_value)    
             row = cursor.fetchone()
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
     return result
 
@@ -62,19 +59,19 @@ def insert(table, column_value):
     for i in column_value:
         columns += '{0},'.format(i)
         values += '{0},'.format(column_value[i])
-    play_date = utils.timer.get_settlement_time()
+    play_date = get_settlement_time()
     sql = f'''INSERT INTO {table} ({columns}play_date) VALUES ({values}'{play_date}')'''
 
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
-        conn.rollback()
+        _conn.rollback()
         return False
     cursor.execute("COMMIT") 
-    conn.commit()
+    _conn.commit()
     return True
 
 def increment(table, column_value, where):
@@ -91,23 +88,23 @@ def increment(table, column_value, where):
             sets += f'''{i}={i}+{column_value[i]},'''
     sql = f'''UPDATE {table} SET {sets[:-1]} WHERE {where}'''
 
-    cursor = conn.cursor()
+    cursor = _conn.cursor()
     cursor.execute("BEGIN")
     try:
         cursor.execute(sql)
-    except sqlite3.OperationalError:
+    except OperationalError:
         FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
-        conn.rollback()
+        _conn.rollback()
         return False
     cursor.execute("COMMIT") 
-    conn.commit()
+    _conn.commit()
     return True
 
 def upsert(table, column_value, where):
     if not column_value:
         return False
 
-    play_date = utils.timer.get_settlement_time()
+    play_date = get_settlement_time()
     where += f''' AND play_date='{play_date}' '''
     result = query(table, where)
 
@@ -115,42 +112,3 @@ def upsert(table, column_value, where):
         return increment(table, column_value, where)
     else:
         return insert(table, column_value)
-
-def find_last_period():
-    sql ='''WITH 
-                dates(cast_date) AS (
-                    SELECT DISTINCT play_date
-                    FROM TimeTable
-                ),
-                groups AS (
-                    SELECT
-                        date(cast_date, '-'||(ROW_NUMBER() OVER (ORDER BY cast_date))||' days') AS grp,
-                        cast_date
-                    FROM dates
-                )
-            SELECT
-                MIN(cast_date) AS date_start,
-                MAX(cast_date) AS date_end
-            FROM groups GROUP BY grp ORDER BY 2 DESC LIMIT 1'''
-
-    cursor = conn.cursor() 
-    result = []
-    try:
-        cursor.execute(sql)
-        result = cursor.fetchone()
-    except sqlite3.OperationalError:
-        FileLogger.exception(f'Exception at {__file__} {__name__}\nSQL: {sql}')
-
-    if not result or len(result) != 2:
-        FileLogger.error('Failed to collect play_date')
-        return
-
-    parsed = []
-    try:
-        parsed.append(str(result[0]))
-        parsed.append(str(result[1]))
-    except ValueError:
-        FileLogger.exception('Date format error')
-        FileLogger.error('Collected play_date not valid')
-        return []
-    return parsed

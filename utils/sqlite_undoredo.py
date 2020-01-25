@@ -14,16 +14,16 @@
 
 """Translation of the TCL example code from https://www.sqlite.org/undoredo.html."""
 
-import re
-import sqlite3
-import sys
+from sqlite3 import OperationalError
+from re import match
+from sys import exit, version_info
+from threading import RLock
 
-
-if sys.version_info < (3, 6):
-    sys.exit('Python version 3.6 or later is required')
-
+if version_info < (3, 6):
+    exit('Python version 3.6 or later is required')
 
 class SQLiteUndoRedo:
+    _sqlur_lock = RLock()
 
     def activate(self, *args):
         """Start up the undo/redo system.
@@ -90,6 +90,8 @@ class SQLiteUndoRedo:
 
     def barrier(self, description):
         """Create an undo barrier right now."""
+        SQLiteUndoRedo._sqlur_lock.acquire()
+
         _undo = self._undo
         try:
             pass
@@ -111,6 +113,8 @@ class SQLiteUndoRedo:
         _undo['undostack'].append([begin, end, description])
         _undo['redostack'] = []
         # self.refresh()
+
+        SQLiteUndoRedo._sqlur_lock.release()
 
     def undo(self):
         """Do a single step of undo."""
@@ -198,7 +202,7 @@ class SQLiteUndoRedo:
         """
         try:
             db.execute("DROP TABLE undolog")
-        except sqlite3.OperationalError:
+        except OperationalError:
             pass
         db.execute("CREATE TEMP TABLE undolog(seq integer primary key, sql text)")
         for tbl in args:
@@ -234,12 +238,12 @@ class SQLiteUndoRedo:
         tlist = db.execute(
             "SELECT name FROM sqlite_temp_master WHERE type='trigger'").fetchall()
         for (trigger,) in tlist:
-            if not re.match("_.*_(i|u|d)t$", trigger):
+            if not match("_.*_(i|u|d)t$", trigger):
                 continue
             db.execute(f"DROP TRIGGER {trigger};")
         try:
             db.execute("DROP TABLE undolog")
-        except sqlite3.OperationalError:
+        except OperationalError:
             pass
 
     def _start_interval(self):
@@ -254,6 +258,8 @@ class SQLiteUndoRedo:
         For an undo V1=="undostack" and V2=="redostack".  For a redo,
         V1=="redostack" and V2=="undostack".
         """
+        SQLiteUndoRedo._sqlur_lock.acquire()
+
         _undo = self._undo
         op = _undo[v1][-1]
         _undo[v1] = _undo[v1][0:-1]
@@ -275,4 +281,6 @@ class SQLiteUndoRedo:
         _undo[v2].append([begin, end, description])
         self._start_interval()
         # self.refresh()
+
+        SQLiteUndoRedo._sqlur_lock.release()
         return description

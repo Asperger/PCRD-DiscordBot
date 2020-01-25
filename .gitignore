@@ -2,8 +2,9 @@
 logs/
 *.stackdump
 *.pyc
-*.db
-*.db3
-*.sqlite
-*.sqlite3
-token.json
+utils/repo.db
+utils/token.json
+utils/credentials.json
+utils/token.pickle
+utils/sheet.id
+utils/spam.setting

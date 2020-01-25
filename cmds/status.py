@@ -1,18 +1,17 @@
-import os, sys, inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
-import utils.db
-import utils.timer
+from datetime import datetime
+from utils.db import query
+from utils.timer import get_settlement_time
 from utils.log import FileLogger
 from utils.guild_member import get_guild_member_nickname, get_guild_member_list
 
-import datetime
+from utils.cmds_registry import register
+register(cmd="status", alias="status")
 
 class status:
     def __init__(self):
         self.usage = '!status [all] [YYYY-MM-DD]'
-        self.date = utils.timer.get_settlement_time()
+        self.auth_warning = '你不是這個公會的隊員吧?'
+        self.date = get_settlement_time()
         self.all_user = False
 
     def check_param(self, param):
@@ -23,22 +22,28 @@ class status:
                 self.all_user = True
             else:
                 try:
-                    datetime.datetime.strptime(p, '%Y-%m-%d')
+                    datetime.strptime(p, '%Y-%m-%d')
                 except ValueError:
                     return False
                 self.date = p
         return True
 
-    def run(self, guild_id, user_id, *param):
-        if not param or len(param[0]) == 0:
-            pass
-        elif not self.check_param(param[0]):
-            return self.usage
+    def check_auth(self, auth):
+        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        if user_nickname:
+            return True
+        else:
+            return False
+
+    def run(self, user_auth, param):
+        guild_id = user_auth['guild_id']
+        user_id = user_auth['user_id']
+
         where = f"play_date='{self.date}'"
         if not self.all_user:
             where += f' AND user_id={user_id}'
 
-        result = utils.db.query('UserTable', where)
+        result = query('UserTable', where)
         report = ''
         member_list = get_guild_member_list(guild_id)
         player_count = len(member_list)
@@ -61,7 +66,7 @@ class status:
         if self.all_user:
             if player_count == len(member_list):
                 report = '還沒有人出刀呢...大家是不是肚子餓了?'
-            else:
+            elif member_list:
                 unattend = ''
                 for unattend_player in member_list:
                     user_nickname = get_guild_member_nickname(guild_id, unattend_player)
@@ -72,12 +77,14 @@ class status:
                 report += f'{unattend}未出刀'
         elif not report:
             author_nickname = get_guild_member_nickname(guild_id, user_id)
-            if author_nickname:
-                report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
-            else:
-                report = '你不是這個公會的隊員吧?'
+            report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
         return report
 
 if __name__ == '__main__':
-    print(status().run(None,123,['all']))
+    user_auth = {
+        'guild_id': None,
+        'user_id': 123,
+        'user_admin': False
+    }
+    print(status().run(user_auth,['all']))
