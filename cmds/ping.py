@@ -9,13 +9,13 @@ class ping:
     def __init__(self):
         self.usage = '!ping [人數]\n不指定人數時將呼叫正選的人\n指定人數時則以此數目呼叫備選的人'
         self.auth_warning = '你不是這個公會的隊員吧?'
-        self.basic = True
+        self.offset = 0
 
     def check_param(self, param):
         if not param:
             return True
         elif len(param) == 1 and param[0].isdigit():
-            self.base = False
+            self.offset = int(param[0])
             return True
         else:
             return False
@@ -31,12 +31,8 @@ class ping:
         guild_id = user_auth['guild_id']
         channel_id = user_auth['channel_id']
 
-        offset = 0
-        if not self.basic:
-            offset = int(param[0])
-
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        players = get_line(guild_id, boss_id, offset)
+        players = get_line(guild_id, boss_id, self.offset)
 
         result = ''
         if players:
