@@ -69,7 +69,11 @@ def line_up(guild_id, user_id, boss_id, comment):
         _guild_lines[guild_id][boss_id]["player_ids"][user_id] = reserved(user_id, comment)
         return '排隊成功'
     else:
-        return '已在隊伍中'
+        comment_updated = ''
+        if _guild_lines[guild_id][boss_id]["player_ids"][user_id].comment != comment:
+            _guild_lines[guild_id][boss_id]["player_ids"][user_id].comment = comment
+            comment_updated = f' 備註已更新為 {comment}'
+        return f'已在隊伍中{comment_updated}'
 
 def line_off(guild_id, user_id, boss_id):
     global _guild_lines
