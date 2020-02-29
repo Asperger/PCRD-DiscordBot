@@ -9,6 +9,9 @@ class reserved:
         self.id = id
         self.comment = cmt
 
+    def __str__(self):
+        return f"{self.id} {self.comment} {self.time}"
+
     def __lt__(self, other):
         return self.time < other.time
 
@@ -18,7 +21,8 @@ def clear_line(guild_id, boss_id):
         if boss_id in _guild_lines[guild_id]:
             _guild_lines[guild_id][boss_id]["player_ids"] = {}
         elif boss_id == 0:
-            del _guild_lines[guild_id]
+            for i in range(1, 6):
+                _guild_lines[guild_id][i]["player_ids"] = {}
         else:
             return False
     else:
@@ -117,5 +121,11 @@ if __name__ == '__main__':
     line_up(guild_id, 100003, boss_id, '')
     line_up(guild_id, 100004, boss_id, '')
     line_up(guild_id, 100005, boss_id, '')
-    print(get_line(guild_id, boss_id, 0))
-    print(get_line(guild_id, boss_id, 1))
+    line_up(guild_id, 100006, boss_id, '')
+    line_up(guild_id, 100007, boss_id, '')
+    print(*get_line(guild_id, boss_id, 0), sep='\n')
+    print(*get_line(guild_id, boss_id, 1), sep='\n')
+    line_off(guild_id, 100003, boss_id)
+    print(*get_line(guild_id, boss_id, 0), sep='\n')
+    print(*get_line(guild_id, boss_id, 1), sep='\n')
+    print(*get_line(guild_id, boss_id, 2), sep='\n')
