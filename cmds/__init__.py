@@ -1,6 +1,7 @@
 __all__ = [
     "usage",
     "fill",
+    "fill_for",
     "status",
     "undo",
     "redo",

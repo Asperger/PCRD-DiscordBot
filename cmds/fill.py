@@ -101,7 +101,7 @@ class fill:
         if not result:
             return f'{user_nickname} 記錄失敗'
 
-        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1]), 'missing_play':plmiss}
+        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':f'{boss_tag} {ploption}', 'missing_play':plmiss}
         db_result = upsert('UserTable', column_value, f'user_id={user_id}')
         if not db_result:
             return f'{user_nickname} 記錄失敗'
