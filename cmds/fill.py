@@ -54,14 +54,17 @@ class fill:
         else:
             return False
 
-    def get_played_number(self, user_id):
+    def get_played_number(self, user_id, play_type):
         date = get_settlement_time()
         where = f"play_date='{date}' AND user_id={user_id}"
         result = query('UserTable', where)
         if result:
-            return result[0]['normal_play'] + result[0]['compensate_play']
+            if play_type == 'normal_play':
+                return result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
+            else:
+                return result[0][play_type] + 1
         else:
-            return 0
+            return 1
 
     def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
@@ -88,7 +91,7 @@ class fill:
         damage = int(param[1])
         description = f'{user_nickname} fill {" ".join(param)}'
 
-        plnumber = self.get_played_number(user_id) + 1
+        plnumber = self.get_played_number(user_id, pltype)
         sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)
         if not sheet_result:
             return f'{user_nickname} 試算表記錄失敗'
@@ -114,4 +117,8 @@ if __name__ == '__main__':
         'user_id': 123,
         'user_admin': False
     }
-    print(fill().run(user_auth,['18-4','1722996','尾']))
+    print(fill().run(user_auth,['18-4','1','尾']))
+    print(fill().run(user_auth,['19-5','2','尾']))
+    print(fill().run(user_auth,['18-1','3']))
+    print(fill().run(user_auth,['19-5','4','補']))
+    print(fill().run(user_auth,['19-4','5','補']))
