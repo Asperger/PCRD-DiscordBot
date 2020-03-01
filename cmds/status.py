@@ -9,23 +9,19 @@ register(cmd="status", alias="status")
 
 class status:
     def __init__(self):
-        self.usage = '!status [all] [YYYY-MM-DD]'
+        self.usage = '!status [YYYY-MM-DD]'
         self.auth_warning = '你不是這個公會的隊員吧?'
         self.date = get_settlement_time()
-        self.all_user = False
 
     def check_param(self, param):
-        if len(param) > 2:
+        if len(param) > 1:
             return False
-        for p in param:
-            if p == 'all':
-                self.all_user = True
-            else:
-                try:
-                    datetime.strptime(p, '%Y-%m-%d')
-                except ValueError:
-                    return False
-                self.date = p
+        elif len(param) == 1:
+            try:
+                datetime.strptime(param[0], '%Y-%m-%d')
+            except ValueError:
+                return False
+            self.date = param[0]
         return True
 
     def check_auth(self, auth):
@@ -39,14 +35,9 @@ class status:
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
 
-        where = f"play_date='{self.date}'"
-        if not self.all_user:
-            where += f' AND user_id={user_id}'
-
+        where = f"play_date='{self.date}' AND user_id={user_id}"
         result = query('UserTable', where)
         report = ''
-        member_list = get_guild_member_list(guild_id)
-        player_count = len(member_list)
         for record in result:
             user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
             if not user_nickname:
@@ -61,21 +52,8 @@ class status:
                 comment += f'仍有{unfinished_play}刀未出'
 
             report += f"{user_nickname} 總傷{record['damage']} 刀{record['normal_play']} 尾{record['last_play']} 補{record['compensate_play']} 閃{record['missing_play']} {comment}\n"
-            member_list.remove(record['user_id'])
 
-        if self.all_user:
-            if player_count == len(member_list):
-                report = '還沒有人出刀呢...大家是不是肚子餓了?'
-            elif member_list:
-                unattend = ''
-                for unattend_player in member_list:
-                    user_nickname = get_guild_member_nickname(guild_id, unattend_player)
-                    if not user_nickname:
-                        FileLogger.warn(f"Unexpected player: {unattend_player}")
-                        continue
-                    unattend += f'{user_nickname} '
-                report += f'{unattend}未出刀'
-        elif not report:
+        if not report:
             author_nickname = get_guild_member_nickname(guild_id, user_id)
             report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
