@@ -2,8 +2,8 @@ from datetime import datetime
 from pytz import timezone
 
 timer_usage = 0
-timer_member_list = {}
-timer_channel_list = {}
+timer_member = 0
+timer_channel = 0
 
 _eu_moscow = timezone('Europe/Moscow')
 

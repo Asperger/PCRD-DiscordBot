@@ -14,20 +14,19 @@ class lineoff:
         return True
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True
         else:
             return False
 
     def run(self, user_auth, param):
-        guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
         channel_id = user_auth['channel_id']
 
-        user_nickname = get_guild_member_nickname(guild_id, user_id)
+        user_nickname = get_guild_member_nickname(user_id)
 
-        boss_id = get_guild_channel_index(guild_id, channel_id)
+        boss_id = get_guild_channel_index(channel_id)
         result = line_off(user_id, boss_id)
         if result:
             return f'{user_nickname} {result}'

@@ -48,7 +48,7 @@ class fill:
         return True
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True
         else:
@@ -67,10 +67,9 @@ class fill:
             return 1
 
     def run(self, user_auth, param):
-        guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
 
-        user_nickname = get_guild_member_nickname(guild_id, user_id)
+        user_nickname = get_guild_member_nickname(user_id)
 
         boss_tag = param[0]
         boss_tags = boss_tag.split('-')
@@ -108,7 +107,7 @@ class fill:
 
         sqlur.barrier(description)
         if pltype != 'last_play':
-            line_off(guild_id, user_id, int(boss_tags[1]))
+            line_off(user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
 
 if __name__ == '__main__':

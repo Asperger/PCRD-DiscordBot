@@ -21,17 +21,16 @@ class ping:
             return False
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True
         else:
             return False
 
     def run(self, user_auth, param):
-        guild_id = user_auth['guild_id']
         channel_id = user_auth['channel_id']
 
-        boss_id = get_guild_channel_index(guild_id, channel_id)
+        boss_id = get_guild_channel_index(channel_id)
         players = get_line(boss_id, self.offset)
 
         result = ''

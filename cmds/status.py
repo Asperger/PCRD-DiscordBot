@@ -26,7 +26,7 @@ class status:
         return True
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True
         else:
@@ -41,7 +41,7 @@ class status:
     def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
-        author_nickname = get_guild_member_nickname(guild_id, user_id)
+        author_nickname = get_guild_member_nickname(user_id)
 
         where = f"play_date='{self.date}' AND user_id={user_id}"
         result = query('UserTable', where)

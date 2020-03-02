@@ -14,7 +14,7 @@ class undo:
         return not param
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['guild_id'], auth['user_id'])
+        user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True
         else:
