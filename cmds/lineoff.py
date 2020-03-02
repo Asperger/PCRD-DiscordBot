@@ -28,7 +28,7 @@ class lineoff:
         user_nickname = get_guild_member_nickname(guild_id, user_id)
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        result = line_off(guild_id, user_id, boss_id)
+        result = line_off(user_id, boss_id)
         if result:
             return f'{user_nickname} {result}'
         else:

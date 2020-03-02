@@ -32,7 +32,7 @@ class ping:
         channel_id = user_auth['channel_id']
 
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        players = get_line(guild_id, boss_id, self.offset)
+        players = get_line(boss_id, self.offset)
 
         result = ''
         if players:

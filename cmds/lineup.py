@@ -29,7 +29,7 @@ class lineup:
 
         comment = ' '.join(param) if param else ''
         boss_id = get_guild_channel_index(guild_id, channel_id)
-        result = line_up(guild_id, user_id, boss_id, comment)
+        result = line_up(user_id, boss_id, comment)
         if result:
             return f'{user_nickname} {result}'
         else:

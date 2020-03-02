@@ -29,7 +29,7 @@ class clear_line:
 
     def run(self, user_auth, *param):
         comment = '設定失敗'
-        result = _clear_line(user_auth['guild_id'], self.boss)
+        result = _clear_line(self.boss)
         if result:
             if self.boss == 0:
                 comment = '排隊記錄清除成功'
