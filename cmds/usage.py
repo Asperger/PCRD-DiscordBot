@@ -26,7 +26,7 @@ class usage:
         return """填表功能:
 `!fill`或`!f` 填表
 `!fill_for`或`!ff` 幫別人填表
-`!status` 查看出刀情況
+`!status`或`!stat` 查看出刀情況
 `!undo` 取消上次輸入的內容 ***不限定使用者!!! 你會把別人輸入的紀錄取消掉!!!***
 `!redo` 重新輸入上次取消的內容
 `!switch_sheets` 設定公會戰報表，僅限公會管理員使用

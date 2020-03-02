@@ -48,12 +48,22 @@ async def on_message(message):
         if msg:
             if isinstance(msg, Mapping):
                 # it's a dict
+                embed = Embed()
+                if "title" in msg:
+                    embed.title = msg["title"]
+                    del msg["title"]
+                if "description" in msg:
+                    embed.description = msg["description"]
+                    del msg["description"]
                 for key in msg:
-                    await message.channel.send(f'{key}: {dumps(msg[key], sort_keys=True, indent=2, ensure_ascii=False)}')
+                    embed.add_field(name=key, value=msg[key])
+                await message.channel.send(embed=embed)
             elif isinstance(msg, list):
                 # it's a list
+                embed = Embed()
                 for i in range(len(msg)):
-                    await message.channel.send(msg[i])
+                    embed.add_field(name=i, value=msg[i])
+                await message.channel.send(embed=embed)
             elif is_url(msg):
                 # it's an url
                 embed = Embed()

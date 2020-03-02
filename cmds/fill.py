@@ -14,7 +14,7 @@ class fill:
         self.usage = '!fill <幾周目>-<幾王> <傷害> [尾|補] [閃]\n如果你擊殺了BOSS，請加上`尾`\n如果你使用了補償時間，請加上`補`\n如果你使用了閃退，請加上`閃`'
         self.auth_warning = '你不是這個公會的隊員吧?'
 
-    def play_type(self, x):
+    def play_type(self, x:str) -> str:
         return {
             '尾': 'last_play',
             '補': 'compensate_play'
@@ -54,7 +54,7 @@ class fill:
         else:
             return False
 
-    def get_played_number(self, user_id, play_type):
+    def get_played_number(self, user_id:int, play_type:str) -> int:
         date = get_settlement_time()
         where = f"play_date='{date}' AND user_id={user_id}"
         result = query('UserTable', where)
@@ -96,12 +96,12 @@ class fill:
         if not sheet_result:
             return f'{user_nickname} 試算表記錄失敗'
 
-        column_value = {'user_id':user_id, 'rounds':boss_tags[0], 'boss':boss_tags[1], 'damage':damage}
+        column_value = {'user_id':user_id, 'rounds':int(boss_tags[0]), 'boss':int(boss_tags[1]), 'damage':int(damage), 'play_type':pltype}
         result = insert('TimeTable', column_value)
         if not result:
             return f'{user_nickname} 記錄失敗'
 
-        column_value = {'user_id':user_id, 'damage':damage, pltype:1, 'played_boss':str(boss_tags[1]), 'missing_play':plmiss}
+        column_value = {'user_id':user_id, pltype:1, 'missing_play':plmiss}
         db_result = upsert('UserTable', column_value, f'user_id={user_id}')
         if not db_result:
             return f'{user_nickname} 記錄失敗'

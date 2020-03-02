@@ -2,10 +2,11 @@ from datetime import datetime
 from utils.db import query
 from utils.timer import get_settlement_time
 from utils.log import FileLogger
-from utils.guild_member import get_guild_member_nickname, get_guild_member_list
+from utils.guild_member import get_guild_member_nickname
 
 from utils.cmds_registry import register
 register(cmd="status", alias="status")
+register(cmd="status", alias="stat")
 
 class status:
     def __init__(self):
@@ -31,30 +32,28 @@ class status:
         else:
             return False
 
+    def play_type(self, x:str) -> str:
+        return {
+            'last_play': '尾刀',
+            'compensate_play': '補償'
+        }.get(x, '')  
+
     def run(self, user_auth, param):
         guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
+        author_nickname = get_guild_member_nickname(guild_id, user_id)
 
         where = f"play_date='{self.date}' AND user_id={user_id}"
         result = query('UserTable', where)
-        report = ''
-        for record in result:
-            user_nickname = get_guild_member_nickname(guild_id, record['user_id'])
-            if not user_nickname:
-                FileLogger.warn(f"Unexpected player: {record['user_id']}")
-                continue
+        report = {}
+        if result:
+            report["title"] = f"{author_nickname}今日出刀狀況"
+            report["description"] = "已用閃退" if int(result[0]['missing_play']) > 0 else "未用閃退"
 
-            comment = ''
-            unfinished_play = 3 - (record['normal_play']+record['missing_play']+record['compensate_play'])
-            if unfinished_play < 3:
-                comment += f"已出{record['played_boss']}王 "
-            if unfinished_play > 0:
-                comment += f'仍有{unfinished_play}刀未出'
-
-            report += f"{user_nickname} 總傷{record['damage']} 刀{record['normal_play']} 尾{record['last_play']} 補{record['compensate_play']} 閃{record['missing_play']} {comment}\n"
-
-        if not report:
-            author_nickname = get_guild_member_nickname(guild_id, user_id)
+            details = query('TimeTable', where)
+            for record in details:
+                report[f"{record['rounds']}周目{record['boss']}王"] = f"{self.play_type(record['play_type'])}{record['damage']}"
+        else:
             report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
         return report

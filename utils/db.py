@@ -13,17 +13,16 @@ try:
             "rounds"	INTEGER NOT NULL,
             "boss"	INTEGER NOT NULL,
             "damage"	INTEGER NOT NULL,
+            "play_type"	TEXT NOT NULL,
             "play_date"	TEXT NOT NULL
         );
         CREATE TABLE "UserTable" (
             "user_id"	INTEGER NOT NULL,
-            "damage"	INTEGER NOT NULL,
             "normal_play"	INTEGER NOT NULL DEFAULT 0,
             "last_play"	INTEGER NOT NULL DEFAULT 0,
             "compensate_play"	INTEGER NOT NULL DEFAULT 0,
             "missing_play"	INTEGER NOT NULL DEFAULT 0,
             "play_date"	TEXT NOT NULL,
-            "played_boss"	TEXT NOT NULL
         );'''
     )
 except OperationalError:
@@ -57,8 +56,11 @@ def insert(table, column_value):
     columns = ''
     values = ''
     for i in column_value:
-        columns += '{0},'.format(i)
-        values += '{0},'.format(column_value[i])
+        columns += f'{i},'
+        if type(column_value[i]) is str:
+            values += f'\'{column_value[i]}\','
+        else:
+            values += f'{column_value[i]},'
     play_date = get_settlement_time()
     sql = f'''INSERT INTO {table} ({columns}play_date) VALUES ({values}'{play_date}')'''
 
