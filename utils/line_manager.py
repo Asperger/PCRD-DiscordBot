@@ -1,5 +1,6 @@
 from operator import itemgetter
 from time import clock
+from utils.log import FileLogger
 
 _guild_lines = {}
 
@@ -24,6 +25,7 @@ def clear_line(boss_id:int) -> bool:
             _guild_lines[i]["player_ids"] = {}
     else:
         return False
+    FileLogger.info('clear_line executed')
     return True
 
 def check_guild_lines(boss_id:int) -> bool:
