@@ -30,7 +30,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    if message.content.startswith('!'):
+    if message.content.startswith('!') or message.content.startswith('！'):
         setup_guild_channel_list(message.author.guild)
         setup_guild_member_list(message.author.guild)
 

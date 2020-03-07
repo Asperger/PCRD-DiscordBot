@@ -2,8 +2,24 @@ from cmds import *
 from utils.log import FileLogger
 from utils.cmds_registry import get_cmd
 
+def strQ2B(ustring):
+    ss = []
+    for s in ustring:
+        rstring = ""
+        for uchar in s:
+            inside_code = ord(uchar)
+            # Handle fullwidth space
+            if inside_code == 12288:
+                inside_code = 32
+            # Handle other fullwidth characters
+            elif (inside_code >= 65281 and inside_code <= 65374):
+                inside_code -= 65248
+            rstring += chr(inside_code)
+        ss.append(rstring)
+    return ''.join(ss)
+
 def parse_args(user_auth, string):
-    args = string.split()
+    args = strQ2B(string).split()
     response = ''
     if not args:
         return response
@@ -48,3 +64,4 @@ if __name__ == '__main__':
     print(parse_args(user_auth, "help"))
     print(parse_args(user_auth, "status 2019-07-27"))
     print(parse_args(user_auth, "ls"))
+    print(strQ2B("ＡＢＣ２５１１３６７６９"))
