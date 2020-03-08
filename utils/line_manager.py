@@ -21,8 +21,8 @@ def clear_line(boss_id:int) -> bool:
     if boss_id in _guild_lines:
         _guild_lines[boss_id]["player_ids"] = {}
     elif boss_id == 0:
-        for i in range(1, 6):
-            _guild_lines[i]["player_ids"] = {}
+        for key in _guild_lines:
+            _guild_lines[key]["player_ids"] = {}
     else:
         return False
     FileLogger.info('clear_line executed')
