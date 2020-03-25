@@ -15,7 +15,7 @@ class fill_for:
         if len(param) < 2:
             return False
         else:
-            match = re.search(R"^<@!(\d{18})>$", param[0])
+            match = re.search(R"^<@!?(\d{18})>$", param[0])
             if match:
                 self.playee_id = int(match.group(1))
             else:
