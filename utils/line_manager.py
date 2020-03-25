@@ -33,28 +33,29 @@ def check_guild_lines(boss_id:int) -> bool:
 
 def set_guild_lines(boss_id:int) -> bool:
     global _guild_lines
-    _guild_lines = {
-        1: {
-            "amount": 0,
-            "player_ids": {}
-        },
-        2: {
-            "amount": 0,
-            "player_ids": {}
-        },
-        3: {
-            "amount": 0,
-            "player_ids": {}
-        },
-        4: {
-            "amount": 0,
-            "player_ids": {}
-        },
-        5: {
-            "amount": 0,
-            "player_ids": {}
-        },
-    }
+    if not bool(_guild_lines):
+        _guild_lines = {
+            1: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            2: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            3: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            4: {
+                "amount": 0,
+                "player_ids": {}
+            },
+            5: {
+                "amount": 0,
+                "player_ids": {}
+            },
+        }
 
     return boss_id in _guild_lines
 
