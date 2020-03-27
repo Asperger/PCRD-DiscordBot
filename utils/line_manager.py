@@ -93,14 +93,14 @@ def set_line(boss_id:int, amount:int) -> bool:
     _guild_lines[boss_id]["amount"] = amount
     return True
 
-def get_line(boss_id:int, offset:int) -> list:
+def get_line(boss_id:int, offset:int, list_all:bool) -> list:
     if not check_guild_lines(boss_id):
         return None
 
     amount = _guild_lines[boss_id]["amount"]
     sorted_line = sorted(_guild_lines[boss_id]["player_ids"].items(), key=itemgetter(1))
     sorted_players = list(map(lambda x: x[1], sorted_line))
-    if amount > 0:
+    if amount > 0 and not list_all:
         if offset > 0:
             return sorted_players[amount:amount+offset]
         else:
@@ -109,7 +109,7 @@ def get_line(boss_id:int, offset:int) -> list:
         return sorted_players
 
 if __name__ == '__main__':
-    boss_id = 123, 1
+    boss_id = 1
     set_line(boss_id, 3)
     line_up(100001, boss_id, '')
     line_up(100002, boss_id, '')
@@ -118,9 +118,9 @@ if __name__ == '__main__':
     line_up(100005, boss_id, '')
     line_up(100006, boss_id, '')
     line_up(100007, boss_id, '')
-    print(*get_line(boss_id, 0), sep='\n')
-    print(*get_line(boss_id, 1), sep='\n')
+    print(*get_line(boss_id, 0, True), sep='\n')
+    print(*get_line(boss_id, 1, False), sep='\n')
     line_off(100003, boss_id)
-    print(*get_line(boss_id, 0), sep='\n')
-    print(*get_line(boss_id, 1), sep='\n')
-    print(*get_line(boss_id, 2), sep='\n')
+    print(*get_line(boss_id, 0, False), sep='\n')
+    print(*get_line(boss_id, 1, False), sep='\n')
+    print(*get_line(boss_id, 2, False), sep='\n')
