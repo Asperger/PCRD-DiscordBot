@@ -1,40 +1,12 @@
 from operator import itemgetter
-from time import clock
+from os.path import dirname, join
+
 from utils.log import FileLogger
+from utils.backup_dict import BackupDict
+from utils.reserved import reserved
+from utils.func_registry import register
 
-_guild_lines = {}
-
-class reserved:
-    def __init__(self, id, cmt):
-        self.time = clock()
-        self.id = id
-        self.comment = cmt
-
-    def __str__(self):
-        return f"{self.id} {self.comment} {self.time}"
-
-    def __lt__(self, other):
-        return self.time < other.time
-
-def clear_line(boss_id:int) -> bool:
-    global _guild_lines
-    if boss_id in _guild_lines:
-        _guild_lines[boss_id]["player_ids"] = {}
-    elif boss_id == 0:
-        for key in _guild_lines:
-            _guild_lines[key]["player_ids"] = {}
-    else:
-        return False
-    FileLogger.info('clear_line executed')
-    return True
-
-def check_guild_lines(boss_id:int) -> bool:
-    return boss_id in _guild_lines
-
-def set_guild_lines(boss_id:int) -> bool:
-    global _guild_lines
-    if not bool(_guild_lines):
-        _guild_lines = {
+_guild_lines = BackupDict({
             1: {
                 "amount": 0,
                 "player_ids": {}
@@ -55,13 +27,33 @@ def set_guild_lines(boss_id:int) -> bool:
                 "amount": 0,
                 "player_ids": {}
             },
-        }
+        })
+_guild_lines_path = join(dirname(__file__), 'guild.lines')
+_guild_lines.setpath(_guild_lines_path)
 
+def backup():
+    _guild_lines.backup()
+
+register(backup)
+
+def clear_line(boss_id:int) -> bool:
+    global _guild_lines
+    if boss_id in _guild_lines:
+        _guild_lines[boss_id]["player_ids"] = {}
+    elif boss_id == 0:
+        for key in _guild_lines:
+            _guild_lines[key]["player_ids"] = {}
+    else:
+        return False
+    FileLogger.info('clear_line executed')
+    return True
+
+def check_guild_lines(boss_id:int) -> bool:
     return boss_id in _guild_lines
 
 def line_up(user_id:int, boss_id:int, comment:str) -> str:
     global _guild_lines
-    if not set_guild_lines(boss_id):
+    if not check_guild_lines(boss_id):
         return ''
 
     if user_id not in _guild_lines[boss_id]["player_ids"]:
@@ -87,7 +79,7 @@ def line_off(user_id:int, boss_id:int) -> str:
 
 def set_line(boss_id:int, amount:int) -> bool:
     global _guild_lines
-    if not set_guild_lines(boss_id):
+    if not check_guild_lines(boss_id):
         return False
 
     _guild_lines[boss_id]["amount"] = amount

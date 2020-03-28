@@ -4,22 +4,20 @@ from threading import Lock
 from random import randint
 from itertools import accumulate
 from bisect import bisect_left
+
 from utils.log import FileLogger
+from utils.backup_dict import BackupDict
+from utils.func_registry import register
 
 _spam_setting_path = join(dirname(__file__), 'spam.setting')
-_spam_setting = {}
-_spam_lock = Lock()
+_spam_setting = BackupDict()
+_spam_setting.setpath(_spam_setting_path)
 _spam_limit = 5
 
-if exists(_spam_setting_path):
-    with open(_spam_setting_path, 'r', encoding="utf-8") as f:
-        spam_setting_str = f.read()
-        if spam_setting_str:
-            try:
-                _spam_setting = eval(spam_setting_str)
-            except Exception as e:
-                FileLogger.error(f'Fail to read spam setting: {str(e)}')
-                _spam_setting = {}
+def backup():
+    _spam_setting.backup()
+
+register(backup)
 
 def revert_accumulate(arr):
     reverted = [arr[0]] * len(arr)
@@ -40,19 +38,11 @@ def popleft_spammer(request):
         _spam_setting[request]["weight"].popleft()
         _spam_setting[request]["list"].popleft()
 
-def backup():
-    with _spam_lock:
-        with open(_spam_setting_path, 'w', encoding="utf-8") as f:
-            try:
-                f.write(repr(_spam_setting))
-            except Exception as e:
-                FileLogger.error(f'Fail to write spam setting: {str(e)}')
-
 def set_spammer_weight(request, weight):
     global _spam_setting
     result = False
 
-    with _spam_lock:
+    with _spam_setting._lock:
         if request in _spam_setting:
             if len(weight) == len(_spam_setting[request]["list"]):
                 _spam_setting[request]["weight"] = deque(accumulate(weight))
@@ -65,7 +55,7 @@ def set_spammer_weight(request, weight):
 def set_spammer(request, response):
     global _spam_setting
 
-    with _spam_lock:
+    with _spam_setting._lock:
         if request in _spam_setting:
             _spam_setting[request]["weight"].append(_spam_setting[request]["weight"][-1]+1)
             _spam_setting[request]["list"].append(response)
@@ -83,7 +73,7 @@ def clear_spammer(request, mode):
     global _spam_setting
     result = False
 
-    with _spam_lock:
+    with _spam_setting._lock:
         if request in _spam_setting:
             if mode == 0 or len(_spam_setting[request]["list"]) == 1:
                 del _spam_setting[request]
@@ -129,6 +119,7 @@ def rename_spammer(request, name):
 
     _spam_setting[name] = _spam_setting[request]
     del _spam_setting[request]
+    backup()
     return ''
 
 if __name__ == '__main__':

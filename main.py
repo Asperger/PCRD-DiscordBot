@@ -10,6 +10,7 @@ from args import parse_args
 from cmds.usage import usage
 
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
+from utils.func_registry import execute
 
 client = Client()
 
@@ -23,6 +24,7 @@ def is_url(x):
 @client.event
 async def on_message(message):
     if message.content == '!stop' and message.author.guild_permissions.administrator:
+        execute()
         await client.logout()
         return
 

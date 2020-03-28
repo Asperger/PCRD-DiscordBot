@@ -8,3 +8,4 @@ utils/credentials.json
 utils/token.pickle
 utils/sheet.id
 utils/spam.setting
+utils/guild.lines
