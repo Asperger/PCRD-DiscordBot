@@ -62,7 +62,7 @@ class fill:
             if play_type == 'normal_play':
                 return result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
             else:
-                return result[0][play_type] + 1
+                return result[0]['normal_play'] + result[0][play_type] + 1
         else:
             return 1
 
