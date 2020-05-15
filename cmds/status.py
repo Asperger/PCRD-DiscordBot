@@ -39,7 +39,6 @@ class status:
         }.get(x, '')  
 
     def run(self, user_auth, param):
-        guild_id = user_auth['guild_id']
         user_id = user_auth['user_id']
         author_nickname = get_guild_member_nickname(user_id)
 
@@ -52,7 +51,12 @@ class status:
 
             details = query('TimeTable', where)
             for record in details:
-                report[f"{record['rounds']}周目{record['boss']}王"] = f"{self.play_type(record['play_type'])}{record['damage']}"
+                boss_info = f"{record['rounds']}周目{record['boss']}王"
+                play_info = f"{self.play_type(record['play_type'])}{record['damage']}"
+                if boss_info in report:
+                    report[boss_info] += f"\n{play_info}"
+                else:
+                    report[boss_info] = play_info
         else:
             report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
@@ -60,7 +64,6 @@ class status:
 
 if __name__ == '__main__':
     user_auth = {
-        'guild_id': None,
         'user_id': 123,
         'user_admin': False
     }
