@@ -31,6 +31,11 @@ _guild_lines = BackupDict({
 _guild_lines_path = join(dirname(__file__), 'guild.lines')
 _guild_lines.setpath(_guild_lines_path)
 
+_time_offset = 0
+for boss in _guild_lines.values():
+    for player in boss["player_ids"].values():
+        _time_offset = max(_time_offset, player.time)
+
 def backup():
     _guild_lines.backup()
 
@@ -45,6 +50,7 @@ def clear_line(boss_id:int) -> bool:
             _guild_lines[key]["player_ids"] = {}
     else:
         return False
+    backup()
     FileLogger.info('clear_line executed')
     return True
 
@@ -57,7 +63,7 @@ def line_up(user_id:int, boss_id:int, comment:str) -> str:
         return ''
 
     if user_id not in _guild_lines[boss_id]["player_ids"]:
-        _guild_lines[boss_id]["player_ids"][user_id] = reserved(user_id, comment)
+        _guild_lines[boss_id]["player_ids"][user_id] = reserved(user_id, comment, _time_offset)
         return '排隊成功'
     else:
         comment_updated = ''

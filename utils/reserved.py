@@ -1,11 +1,8 @@
 from time import clock
 
 class reserved:
-    def __init__(self, id, cmt, time=None):
-        if time is None:
-            self.time = clock()
-        else:
-            self.time = time
+    def __init__(self, id, cmt, time=0):
+        self.time = time + clock()
         self.id = id
         self.comment = cmt
 
