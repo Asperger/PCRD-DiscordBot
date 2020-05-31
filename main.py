@@ -22,6 +22,10 @@ def is_url(x):
         return False
 
 @client.event
+async def on_message_edit(before, after):
+    await on_message(after)
+
+@client.event
 async def on_message(message):
     if message.content == '!stop' and message.author.guild_permissions.administrator:
         execute()
