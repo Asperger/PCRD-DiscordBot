@@ -59,10 +59,11 @@ class fill:
         where = f"play_date='{date}' AND user_id={user_id}"
         result = query('UserTable', where)
         if result:
+            lastboss = int(result[0]['played_boss'] or 0)
             if play_type == 'normal_play':
-                return int(result[0]['played_boss']), result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
+                return lastboss, result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
             else:
-                return int(result[0]['played_boss']), result[0]['normal_play'] + result[0][play_type] + 1
+                return lastboss, result[0]['normal_play'] + result[0][play_type] + 1
         else:
             return 0, 1
 
