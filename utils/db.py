@@ -85,7 +85,7 @@ def increment(table, column_value, where):
         if where.startswith(i):
             continue
         if type(column_value[i]) is str:
-            sets += f'''{i}={i}||','||{column_value[i]},'''
+            sets += f'''{i}='{column_value[i]}','''
         else:
             sets += f'''{i}={i}+{column_value[i]},'''
     sql = f'''UPDATE {table} SET {sets[:-1]} WHERE {where}'''

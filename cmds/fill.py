@@ -54,17 +54,17 @@ class fill:
         else:
             return False
 
-    def get_played_number(self, user_id:int, play_type:str) -> int:
+    def get_played_number(self, user_id:int, play_type:str) -> (int, int):
         date = get_settlement_time()
         where = f"play_date='{date}' AND user_id={user_id}"
         result = query('UserTable', where)
         if result:
             if play_type == 'normal_play':
-                return result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
+                return int(result[0]['played_boss']), result[0]['normal_play'] + max(result[0]['last_play'], result[0]['compensate_play']) + 1
             else:
-                return result[0]['normal_play'] + result[0][play_type] + 1
+                return int(result[0]['played_boss']), result[0]['normal_play'] + result[0][play_type] + 1
         else:
-            return 1
+            return 0, 1
 
     def run(self, user_auth, param):
         user_id = user_auth['user_id']
@@ -90,7 +90,7 @@ class fill:
         damage = int(param[1])
         description = f'{user_nickname} fill {" ".join(param)}'
 
-        plnumber = self.get_played_number(user_id, pltype)
+        lastboss, plnumber = self.get_played_number(user_id, pltype)
         sheet_result = fill_sheet(user_id, description, plnumber, boss_tag, damage, ploption, plmiss)
         if not sheet_result:
             return f'{user_nickname} 試算表記錄失敗'
@@ -101,12 +101,16 @@ class fill:
             return f'{user_nickname} 記錄失敗'
 
         column_value = {'user_id':user_id, pltype:1, 'missing_play':plmiss}
+        if pltype == 'last_play':
+            column_value['played_boss'] = boss_tags[1]
         db_result = upsert('UserTable', column_value, f'user_id={user_id}')
         if not db_result:
             return f'{user_nickname} 記錄失敗'
 
         sqlur.barrier(description)
-        if pltype != 'last_play':
+        if pltype == 'compensate_play':
+            line_off(user_id, lastboss)
+        elif pltype == 'normal_play':
             line_off(user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
 

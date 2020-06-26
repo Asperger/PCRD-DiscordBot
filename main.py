@@ -28,6 +28,7 @@ async def on_message_edit(before, after):
 @client.event
 async def on_message(message):
     if message.content == '!stop' and message.author.guild_permissions.administrator:
+        FileLogger.info('User requested shutdown')
         execute()
         await client.logout()
         return
