@@ -23,7 +23,9 @@ def is_url(x):
 
 @client.event
 async def on_message_edit(before, after):
-    await on_message(after)
+    if before.content != after.content:
+        FileLogger.info('User edited message')
+        await on_message(after)
 
 @client.event
 async def on_message(message):
