@@ -1,6 +1,6 @@
 from utils.db import sqlur
 from utils.google_sheets_utils import undo as sheets_undo
-from utils.guild_member import get_guild_member_nickname
+from utils.guild_member import get_guild_member_nickname, get_guild_channel_board
 
 from utils.cmds_registry import register
 register(cmd="undo", alias="undo")
@@ -14,6 +14,10 @@ class undo:
         return not param
 
     def check_auth(self, auth):
+        if auth['channel_id'] != get_guild_channel_board():
+            self.auth_warning = '請到登記區登記'
+            return False
+
         user_nickname = get_guild_member_nickname(auth['user_id'])
         if user_nickname:
             return True

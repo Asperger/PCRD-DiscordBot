@@ -4,6 +4,7 @@ from utils.log import FileLogger
 
 _guild_member_list = {}
 _guild_channel_list = {}
+_guild_channel_board = 0
 
 def setup_guild_member_list(guild):
     global timer_member, _guild_member_list
@@ -41,7 +42,7 @@ def get_guild_member_list():
     return set(_guild_member_list.keys())
 
 def setup_guild_channel_list(guild):
-    global timer_channel, _guild_channel_list
+    global timer_channel, _guild_channel_list, _guild_channel_board
     if bool(_guild_channel_list):
         elapsed_time = time() - timer_channel
         if elapsed_time < 86400:
@@ -64,6 +65,8 @@ def setup_guild_channel_list(guild):
             elif channel.name.startswith('五王'):
                 _guild_channel_list[5] = channel.id
                 _guild_channel_list[channel.id] = 5
+        if channel.type.name == 'text' and channel.name.endswith('刀傷登記區'):
+            _guild_channel_board = channel.id
     timer_channel = time()
 
 def get_guild_channel_list():
@@ -80,3 +83,6 @@ def get_guild_channel_id(boss_index):
         FileLogger.warn('Unknown boss index')
         return
     return _guild_channel_list[boss_index]
+
+def get_guild_channel_board():
+    return _guild_channel_board
