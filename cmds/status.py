@@ -46,7 +46,7 @@ class status:
         result = query('UserTable', where)
         report = {}
         if result:
-            report["title"] = f"{author_nickname}今日出刀狀況"
+            report["title"] = f"{self.date}出刀狀況"
             report["description"] = "已用閃退" if int(result[0]['missing_play']) > 0 else "未用閃退"
 
             details = query('TimeTable', where)

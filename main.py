@@ -1,5 +1,5 @@
 # Work with Python 3.6
-from discord import Client, Embed
+from discord import Client, User, Embed
 from json import dumps
 from collections import Mapping
 from urllib.parse import urlparse
@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from utils.log import FileLogger
 from utils.token import get_token
 from args import parse_args
-from cmds.usage import usage
+from cmds.usage import usage_content
 
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 from utils.func_registry import execute
@@ -20,6 +20,24 @@ def is_url(x):
         return all([result.scheme, result.netloc])
     except:
         return False
+
+def embed_template(user:User) -> Embed:
+    embed = Embed(color=0xffa200)
+    embed.set_author(name=user.display_name, icon_url=user.avatar_url)
+    embed.set_footer(text=client.user.name, icon_url=client.user.avatar_url)
+    return embed
+
+def get_embed(user:User, content:dict) -> Embed:
+    embed = embed_template(user)
+    if "title" in content:
+        embed.title = content["title"]
+        del content["title"]
+    if "description" in content:
+        embed.description = content["description"]
+        del content["description"]
+    for key in content:
+        embed.add_field(name=key, value=content[key], inline=False)
+    return embed
 
 @client.event
 async def on_message_edit(before, after):
@@ -56,25 +74,17 @@ async def on_message(message):
         if msg:
             if isinstance(msg, Mapping):
                 # it's a dict
-                embed = Embed()
-                if "title" in msg:
-                    embed.title = msg["title"]
-                    del msg["title"]
-                if "description" in msg:
-                    embed.description = msg["description"]
-                    del msg["description"]
-                for key in msg:
-                    embed.add_field(name=key, value=msg[key])
+                embed = get_embed(message.author, msg)
                 await message.channel.send(embed=embed)
             elif isinstance(msg, list):
                 # it's a list
-                embed = Embed()
+                embed = embed_template(message.author)
                 for i in range(len(msg)):
-                    embed.add_field(name=i, value=msg[i])
+                    embed.add_field(name=i, value=msg[i], inline=False)
                 await message.channel.send(embed=embed)
             elif is_url(msg):
                 # it's an url
-                embed = Embed()
+                embed = Embed(color=0xffa200)
                 embed.set_image(url=msg)
                 await message.channel.send(embed=embed)
             else:
@@ -83,7 +93,9 @@ async def on_message(message):
 @client.event
 async def on_member_join(member):
     if not member.bot:
-        await member.send(f':grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:\n{usage().run({}, [])}')
+        embed = get_embed(member, usage_content)
+        embed.description += f'\n:grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:'
+        await member.send(embed=embed)
 
 @client.event
 async def on_ready():
