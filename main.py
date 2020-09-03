@@ -31,12 +31,11 @@ def get_embed(user:User, content:dict) -> Embed:
     embed = embed_template(user)
     if "title" in content:
         embed.title = content["title"]
-        del content["title"]
     if "description" in content:
         embed.description = content["description"]
-        del content["description"]
     for key in content:
-        embed.add_field(name=key, value=content[key], inline=False)
+        if key not in ("title", "description"):
+            embed.add_field(name=key, value=content[key], inline=False)
     return embed
 
 @client.event

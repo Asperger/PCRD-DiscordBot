@@ -12,6 +12,8 @@ def setup_guild_member_list(guild):
         elapsed_time = time() - timer_member
         if elapsed_time < 86400:
             return
+
+    FileLogger.info(f'Setting up members in {guild.name}')
     _guild_member_list = {}
     for i in range(0, len(guild.members)):
         valid = False
@@ -47,6 +49,8 @@ def setup_guild_channel_list(guild):
         elapsed_time = time() - timer_channel
         if elapsed_time < 86400:
             return
+
+    FileLogger.info(f'Setting up channels in {guild.name}')
     _guild_channel_list = {}
     for channel in guild.channels:
         if channel.type.name == 'text' and channel.category.name.endswith('公會戰討論區'):
