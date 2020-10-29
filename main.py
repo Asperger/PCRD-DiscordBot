@@ -1,5 +1,5 @@
 # Work with Python 3.6
-from discord import Client, User, Embed
+from discord import Client, User, Embed, Intents
 from json import dumps
 from collections import Mapping
 from urllib.parse import urlparse
@@ -12,7 +12,8 @@ from cmds.usage import usage_content
 from utils.guild_member import setup_guild_member_list, setup_guild_channel_list
 from utils.func_registry import execute
 
-client = Client()
+intent = Intents(messages=True, guilds=True, members=True)
+client = Client(intents=intent)
 
 def is_url(x):
     try:
