@@ -6,11 +6,11 @@ _guild_member_list = {}
 _guild_channel_list = {}
 _guild_channel_board = 0
 
-def setup_guild_member_list(guild):
+def setup_guild_member_list(guild, override=False):
     global timer_member, _guild_member_list
     if bool(_guild_member_list) :
         elapsed_time = time() - timer_member
-        if elapsed_time < 86400:
+        if elapsed_time < 86400 and not override:
             return
 
     FileLogger.info(f'Setting up members in {guild.name}')
@@ -43,11 +43,11 @@ def get_guild_member_nickname(user_id):
 def get_guild_member_list():
     return set(_guild_member_list.keys())
 
-def setup_guild_channel_list(guild):
+def setup_guild_channel_list(guild, override=False):
     global timer_channel, _guild_channel_list, _guild_channel_board
     if bool(_guild_channel_list):
         elapsed_time = time() - timer_channel
-        if elapsed_time < 86400:
+        if elapsed_time < 86400 and not override:
             return
 
     FileLogger.info(f'Setting up channels in {guild.name}')

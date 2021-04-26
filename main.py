@@ -93,6 +93,8 @@ async def on_message(message):
 @client.event
 async def on_member_join(member):
     if not member.bot:
+        setup_guild_channel_list(member.guild, True)
+        setup_guild_member_list(member.guild, True)
         embed = get_embed(member, usage_content)
         embed.description += f'\n:grinning: 請等會長將你加入"隊員"身分組，再嘗試使用以下功能:'
         await member.send(embed=embed)
@@ -101,6 +103,7 @@ async def on_member_join(member):
 async def on_ready():
     FileLogger.info(f'Logged in as {client.user.name}({client.user.id})')
     for guild in client.guilds:
-        setup_guild_channel_list(guild)
+        setup_guild_channel_list(guild, True)
+        setup_guild_member_list(guild, True)
 
 client.run(get_token())
