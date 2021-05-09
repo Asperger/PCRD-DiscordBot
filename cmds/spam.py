@@ -16,4 +16,4 @@ class spam:
         return True
 
     def run(self, user_auth, param):
-        return get_spammer(param[0])
+        return get_spammer(param[0])[0]

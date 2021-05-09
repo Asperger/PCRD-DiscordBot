@@ -1,11 +1,9 @@
 from os.path import exists, dirname, join
-from collections import deque
 from threading import Lock
 from random import randint
 from itertools import accumulate
 from bisect import bisect_left
 
-from utils.log import FileLogger
 from utils.backup_dict import BackupDict
 from utils.func_registry import register
 
@@ -25,18 +23,15 @@ def revert_accumulate(arr):
         reverted[i] = arr[i] - arr[i-1]
     return reverted
 
-def pop_spammer(request):
+def del_spammer(request, index):
     if request in _spam_setting:
-        _spam_setting[request]["weight"].pop()
-        _spam_setting[request]["list"].pop()
-
-def popleft_spammer(request):
-    if request in _spam_setting:
-        popped = _spam_setting[request]["weight"][0]
+        popped = _spam_setting[request]["weight"][index]
         for k,v in enumerate(_spam_setting[request]["weight"]):
-            _spam_setting[request]["weight"][k] = v - popped
-        _spam_setting[request]["weight"].popleft()
-        _spam_setting[request]["list"].popleft()
+            if k >= index:
+                _spam_setting[request]["weight"][k] = v - popped
+        del _spam_setting[request]["weight"][index]
+        del _spam_setting[request]["list"][index]
+        del _spam_setting[request]["author"][index]
 
 def set_spammer_weight(request, weight):
     global _spam_setting
@@ -45,65 +40,70 @@ def set_spammer_weight(request, weight):
     with _spam_setting._lock:
         if request in _spam_setting:
             if len(weight) == len(_spam_setting[request]["list"]):
-                _spam_setting[request]["weight"] = deque(accumulate(weight))
+                _spam_setting[request]["weight"] = accumulate(weight)
                 result = True
 
     if result:
         backup()
     return result
 
-def set_spammer(request, response):
+def set_spammer(request, response, author):
     global _spam_setting
 
     with _spam_setting._lock:
         if request in _spam_setting:
             _spam_setting[request]["weight"].append(_spam_setting[request]["weight"][-1]+1)
             _spam_setting[request]["list"].append(response)
+            _spam_setting[request]["author"].append(author)
 
             if len(_spam_setting[request]["list"]) > _spam_limit:
-                popleft_spammer(request)
+                del_spammer(request, 0)
         else:
-            _spam_setting[request] = {"index": -1, "list": deque([response]), "weight":deque([1])}
-            _spam_setting[request]["weight"] = deque(accumulate(_spam_setting[request]["weight"]))
+            _spam_setting[request] = {"index": -1, "author": [author], "list": [response], "weight":[1]}
 
     backup()
     return True
 
-def clear_spammer(request, mode):
+def clear_spammer(request, order):
     global _spam_setting
     result = False
+    number = len(_spam_setting[request]["list"])
 
     with _spam_setting._lock:
         if request in _spam_setting:
-            if mode == 0 or len(_spam_setting[request]["list"]) == 1:
+            if order <= 0 or order > number or number == 1:
                 del _spam_setting[request]
-            elif mode > 0:
-                popleft_spammer(request)
-            elif mode < 0:
-                pop_spammer(request)
+            else:
+                del_spammer(request, order - 1)
             result = True
 
     if result:
         backup()
     return result
 
-def get_spammer(request):
+def get_spammer(request, order=0):
     global _spam_setting
     result = None
+    author = None
 
     if request in _spam_setting:
         # no use for random pick
         #index = (spam_setting[request]["index"] + 1) % len(spam_setting[request]["list"])
         #spam_setting[request]["index"] = index
-        index = bisect_left(_spam_setting[request]["weight"], randint(1, _spam_setting[request]["weight"][-1]))
+        if order > 0 and order <= len(_spam_setting[request]["list"]):
+            index = order - 1
+        else:
+            index = bisect_left(_spam_setting[request]["weight"], randint(1, _spam_setting[request]["weight"][-1]))
         result = _spam_setting[request]["list"][index]
+        author = _spam_setting[request]["author"][index]
 
-    return result
+    return result, author
 
 def list_spammer(request):
     result = {}
     if request:
         if request in _spam_setting:
+            result["author"] = _spam_setting[request]["author"]
             result["weight"] = revert_accumulate(_spam_setting[request]["weight"])
             result["list"] = _spam_setting[request]["list"]
     else:

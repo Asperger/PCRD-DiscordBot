@@ -17,7 +17,7 @@ class set_spam:
         return True
 
     def run(self, user_auth, param):
-        result = set_spammer(param[0], param[1])
+        result = set_spammer(param[0], param[1], user_auth['user_id'])
         if result:
             return '嘿嘿'
         else:
