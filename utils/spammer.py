@@ -121,9 +121,3 @@ def rename_spammer(request, name):
     del _spam_setting[request]
     backup()
     return ''
-
-if __name__ == '__main__':
-    print(list_spammer(''))
-    set_spammer_weight('<:REDiveCrystal:628287087237660692>', [795,180,25])
-    print(list_spammer('<:REDiveCrystal:628287087237660692>'))
-    print(get_spammer('<:REDiveCrystal:628287087237660692>'))

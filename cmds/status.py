@@ -57,10 +57,3 @@ class status:
             report = f'{author_nickname}還沒出刀呢...是不是肚子餓了?'
 
         return report
-
-if __name__ == '__main__':
-    user_auth = {
-        'user_id': 123,
-        'user_admin': False
-    }
-    print(status().run(user_auth,['all']))

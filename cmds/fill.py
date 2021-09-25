@@ -114,15 +114,3 @@ class fill:
         elif pltype == 'normal_play':
             line_off(user_id, int(boss_tags[1]))
         return f'{user_nickname} 記錄成功'
-
-if __name__ == '__main__':
-    user_auth = {
-        'guild_id': None,
-        'user_id': 123,
-        'user_admin': False
-    }
-    print(fill().run(user_auth,['18-4','1','尾']))
-    print(fill().run(user_auth,['19-5','2','尾']))
-    print(fill().run(user_auth,['18-1','3']))
-    print(fill().run(user_auth,['19-5','4','補']))
-    print(fill().run(user_auth,['19-4','5','補']))

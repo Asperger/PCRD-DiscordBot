@@ -54,14 +54,3 @@ def parse_args(user_auth, string):
         FileLogger.exception(f'Exception at {__file__} {__name__}')
 
     return response
-
-if __name__ == '__main__':
-    user_auth = {
-        'guild_id': None,
-        'user_id': 123,
-        'user_admin': False
-    }
-    print(parse_args(user_auth, "help"))
-    print(parse_args(user_auth, "status 2019-07-27"))
-    print(parse_args(user_auth, "ls"))
-    print(strQ2B("ＡＢＣ２５１１３６７６９"))

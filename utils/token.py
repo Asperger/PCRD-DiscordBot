@@ -6,6 +6,3 @@ def get_token():
     with open(token_path) as json_file:
         data = load(json_file)
         return data['token']
-
-if __name__ == '__main__':
-    print(get_token())

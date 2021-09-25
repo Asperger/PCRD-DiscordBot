@@ -105,20 +105,3 @@ def get_line(boss_id:int, offset:int, list_all:bool) -> list:
             return sorted_players[:amount]
     else:
         return sorted_players
-
-if __name__ == '__main__':
-    boss_id = 1
-    set_line(boss_id, 3)
-    line_up(100001, boss_id, '')
-    line_up(100002, boss_id, '')
-    line_up(100003, boss_id, '')
-    line_up(100004, boss_id, '')
-    line_up(100005, boss_id, '')
-    line_up(100006, boss_id, '')
-    line_up(100007, boss_id, '')
-    print(*get_line(boss_id, 0, True), sep='\n')
-    print(*get_line(boss_id, 1, False), sep='\n')
-    line_off(100003, boss_id)
-    print(*get_line(boss_id, 0, False), sep='\n')
-    print(*get_line(boss_id, 1, False), sep='\n')
-    print(*get_line(boss_id, 2, False), sep='\n')

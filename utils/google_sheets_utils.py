@@ -202,36 +202,3 @@ def redo():
 if exists(_sheet_id_path):
     with open(_sheet_id_path, 'r') as f:
         switch_sheets(f.read())
-
-if __name__ == '__main__':
-    #switch_sheets('1eucoItgkCSRhV46XKqMEGmNG_5Ob6Es2O60ordUc-_4')
-    switch_sheets('1f3lGlsbr-nc4k8rNwzw1QRDAoqQhrnzXmfY8LMSeNs0')
-    print(get_start_date())
-    print(get_player_list())
-    fill_sheet(538023210864738314, '親愛的 fill 6-5 2856005 尾', 1, '6-5', 2856005, '尾', 0)
-    undo()
-    redo()
-
-    t1f = Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 6-5 2345678 閃', 2, '6-5', 2345678, '', 1))
-    t1u = Thread(target=undo)
-    t1r = Thread(target=redo)
-
-    t2f = Thread(target=fill_sheet, args=(538023210864738314, '親愛的 fill 7-1 1234567', 3, '7-1', 1234567, '', 0))
-    t2u = Thread(target=undo)
-    t2r = Thread(target=redo)
-
-    t1f.start()
-    t1u.start()
-    t1r.start()
-
-    t2f.start()
-    t2u.start()
-    t2r.start()
-
-    t1f.join()
-    t1u.join()
-    t1r.join()
-
-    t2f.join()
-    t2u.join()
-    t2r.join()
