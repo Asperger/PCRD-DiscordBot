@@ -2,7 +2,7 @@ from datetime import datetime
 from utils.db import query
 from utils.timer import get_settlement_time
 from utils.log import FileLogger
-from utils.guild_member import get_guild_member_nickname
+from utils.guild_member import check_guild_crew, get_guild_member_nickname
 
 from utils.cmds_registry import register
 register(cmd="status", alias="status")
@@ -26,11 +26,7 @@ class status:
         return True
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['user_id'])
-        if user_nickname:
-            return True
-        else:
-            return False
+        return check_guild_crew(auth['user_id'])
 
     def play_type(self, x:str) -> str:
         return {

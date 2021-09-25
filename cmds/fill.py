@@ -2,7 +2,7 @@ from utils.db import query, insert, upsert, sqlur
 from utils.log import FileLogger
 from utils.line_manager import line_off
 from utils.timer import get_settlement_time
-from utils.guild_member import get_guild_member_nickname, get_guild_channel_board
+from utils.guild_member import check_guild_crew, get_guild_member_nickname, get_guild_channel_board
 from utils.google_sheets_utils import fill_sheet
 
 from utils.cmds_registry import register
@@ -52,11 +52,7 @@ class fill:
             self.auth_warning = '請到登記區登記'
             return False
 
-        user_nickname = get_guild_member_nickname(auth['user_id'])
-        if user_nickname:
-            return True
-        else:
-            return False
+        return check_guild_crew(auth['user_id'])
 
     def get_played_number(self, user_id:int, play_type:str) -> (int, int):
         date = get_settlement_time()

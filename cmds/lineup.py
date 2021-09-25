@@ -1,5 +1,5 @@
 from utils.log import FileLogger
-from utils.guild_member import get_guild_member_nickname, get_guild_channel_index
+from utils.guild_member import check_guild_crew, get_guild_member_nickname, get_guild_channel_index
 from utils.line_manager import line_up
 
 from utils.cmds_registry import register
@@ -14,11 +14,7 @@ class lineup:
         return True
 
     def check_auth(self, auth):
-        user_nickname = get_guild_member_nickname(auth['user_id'])
-        if user_nickname:
-            return True
-        else:
-            return False
+        return check_guild_crew(auth['user_id'])
 
     def run(self, user_auth, param):
         user_id = user_auth['user_id']
