@@ -15,13 +15,6 @@ from utils.func_registry import execute
 intent = Intents(messages=True, guilds=True, members=True)
 client = Client(intents=intent)
 
-def is_url(x):
-    try:
-        result = urlparse(x)
-        return all([result.scheme, result.netloc])
-    except:
-        return False
-
 def embed_template(user:User) -> Embed:
     embed = Embed(color=0xffa200)
     embed.set_author(name=user.display_name, icon_url=user.avatar_url)
@@ -81,11 +74,6 @@ async def on_message(message):
                 embed = embed_template(message.author)
                 for i in range(len(msg)):
                     embed.add_field(name=i, value=msg[i], inline=False)
-                await message.channel.send(embed=embed)
-            elif is_url(msg):
-                # it's an url
-                embed = Embed(color=0xffa200)
-                embed.set_image(url=msg)
                 await message.channel.send(embed=embed)
             else:
                 await message.channel.send(msg)
