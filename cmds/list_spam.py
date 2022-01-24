@@ -26,11 +26,9 @@ class list_spam:
         spam_list = list_spammer(cmd)
         if cmd and spam_list:
             number = len(spam_list['list'])
-            comment += f'{cmd} 共{number}種反應'
-            if number > 1:
-                comment += f' 權重: [{" ".join(map(str, spam_list["weight"]))}]\n'
-                for i in range(number):
-                    comment += f'編號:{i+1} 作者:{get_guild_member_nickname(spam_list["author"][i])} {spam_list["list"][i]}\n'
+            comment += f'{cmd} 共{number}種反應 權重: [{" ".join(map(str, spam_list["weight"]))}]\n'
+            for i in range(number):
+                comment += f'編號:{i+1} 作者:{get_guild_member_nickname(spam_list["author"][i])} {spam_list["list"][i]}\n'
         else:
             for key in spam_list:
                 comment += f'{key} 共{spam_list[key]}種反應\n'
