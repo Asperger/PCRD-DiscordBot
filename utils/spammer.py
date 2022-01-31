@@ -24,8 +24,12 @@ def revert_accumulate(arr):
     return reverted
 
 def del_spammer(request, index):
+    global _spam_setting
     if request in _spam_setting:
-        popped = _spam_setting[request]["weight"][index]
+        if index == 0:
+            popped = _spam_setting[request]["weight"][index]
+        else:
+            popped = _spam_setting[request]["weight"][index] - _spam_setting[request]["weight"][index-1]
         for k,v in enumerate(_spam_setting[request]["weight"]):
             if k >= index:
                 _spam_setting[request]["weight"][k] = v - popped
