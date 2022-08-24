@@ -31,7 +31,7 @@ class list_spam:
                 comment += f'編號:{i+1} 作者:{get_guild_member_nickname(spam_list["author"][i])} {spam_list["list"][i]}\n'
         else:
             for key in spam_list:
-                comment += f'{key} 共{spam_list[key]}種反應\n'
+                comment += f'{key}:{spam_list[key]}種\n'
 
         if not comment:
             comment = '目前沒有設定反應'
