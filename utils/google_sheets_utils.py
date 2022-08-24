@@ -1,36 +1,18 @@
-from pickle import load, dump
 from os.path import exists, dirname, join
 from threading import Thread, RLock
 from datetime import datetime
 from utils.log import FileLogger
 from utils.timer import get_settlement_time_object
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 
-_scopes = ['https://www.googleapis.com/auth/spreadsheets']
-_creds_path = join(dirname(__file__), 'credentials.json')
-_pickle_path = join(dirname(__file__), 'token.pickle')
-_sheet_id_path = join(dirname(__file__), 'sheet.id')
+_creds_path = join(dirname(__file__), 'developer.key')
 _creds = None
-# The file token.pickle stores the user's access and refresh tokens, and is
-# created automatically when the authorization flow completes for the first
-# time.
-if exists(_pickle_path):
-    with open(_pickle_path, 'rb') as token:
-        _creds = load(token)
-# If there are no (valid) credentials available, let the user log in.
-if not _creds or not _creds.valid:
-    if _creds and _creds.expired and _creds.refresh_token:
-        _creds.refresh(Request())
-    else:
-        flow = InstalledAppFlow.from_client_secrets_file(_creds_path, _scopes)
-        _creds = flow.run_console()
-    # Save the credentials for the next run
-    with open(_pickle_path, 'wb') as token:
-        dump(_creds, token)
+# Read API key from file.
+if exists(_creds_path):
+    with open(_creds_path, 'r') as token:
+        _creds = token.read()
 
-_service = build('sheets', 'v4', credentials=_creds)
+_service = build('sheets', 'v4', developerKey=_creds)
 
 _spreadsheet_id = ''
 _start_date = datetime.now()

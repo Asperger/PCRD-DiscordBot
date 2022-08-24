@@ -5,6 +5,7 @@ logs/
 utils/repo.db
 utils/token.json
 utils/credentials.json
+utils/developer.key
 utils/token.pickle
 utils/sheet.id
 utils/spam.setting
